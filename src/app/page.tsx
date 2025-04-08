@@ -225,57 +225,58 @@ END:VCALENDAR`
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-white dark:bg-gray-900 text-black dark:text-white space-y-12">
-<section className="relative w-full min-h-[60vh] bg-gradient-to-br from-neutral-950 to-neutral-900 text-white px-6 py-20 flex flex-col justify-center items-center text-center">
-  <div className="mb-6">
-    <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">Reels & Rye</h1>
-    <p className="text-lg sm:text-xl text-neutral-400 mt-4 max-w-md mx-auto">
-      Movies. Bourbon. Brotherhood.
-    </p>
-  </div>
-
-  {movies.length > 0 && (() => {
-    const firstMovie = movies[0];
-    try {
-      const [timePart, modifier] = firstMovie.time.split(' ');
-      const hour = parseInt(timePart, 10);
-      const adjustedHour = (modifier === 'PM' && hour !== 12)
-        ? hour + 12
-        : (modifier === 'AM' && hour === 12 ? 0 : hour);
-      const formattedHour = adjustedHour.toString().padStart(2, '0');
-      const dateObj = new Date(`${firstMovie.date}T${formattedHour}:00:00`);
-
-      const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-      const month = dateObj.toLocaleDateString('en-US', { month: 'long' });
-      const day = dateObj.getDate();
-      const suffix = (day === 1 || day === 21 || day === 31)
-        ? 'st' : (day === 2 || day === 22)
-        ? 'nd' : (day === 3 || day === 23)
-        ? 'rd' : 'th';
-
-      return (
-        <div className="mt-6 bg-white/5 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md">
-          <p className="text-sm uppercase text-neutral-400 tracking-wide mb-1">Next Screening</p>
-          <p className="text-lg font-semibold">
-            {weekday}, {month} {day}{suffix} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
+      <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-neutral-950 to-neutral-900">
+        <img
+          src="/banner-overlay.png"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
+        />
+        <div className="relative z-10 text-center text-white">
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight font-serif mb-4">Reels & Rye</h1>
+          <p className="text-lg sm:text-xl text-neutral-300 max-w-md mx-auto">
+            Movies. Bourbon. Brotherhood.
           </p>
-        </div>
-      );
-    } catch {
-      return (
-        <div className="mt-6 bg-white/5 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md">
-          <p className="text-sm uppercase text-neutral-400 tracking-wide mb-1">Next Screening</p>
-          <p className="text-lg font-semibold">
-            {firstMovie.date} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
-          </p>
-        </div>
-      );
-    }
-  })()}
 
-  <div className="absolute bottom-4 text-xs text-neutral-600">
-    Scroll down to RSVP or recommend a movie
-  </div>
-</section>
+          {movies.length > 0 && (() => {
+            const firstMovie = movies[0];
+            try {
+              const [timePart, modifier] = firstMovie.time.split(' ');
+              const hour = parseInt(timePart, 10);
+              const adjustedHour = (modifier === 'PM' && hour !== 12)
+                ? hour + 12
+                : (modifier === 'AM' && hour === 12 ? 0 : hour);
+              const formattedHour = adjustedHour.toString().padStart(2, '0');
+              const dateObj = new Date(`${firstMovie.date}T${formattedHour}:00:00`);
+
+              const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+              const month = dateObj.toLocaleDateString('en-US', { month: 'long' });
+              const day = dateObj.getDate();
+              const suffix = (day === 1 || day === 21 || day === 31)
+                ? 'st' : (day === 2 || day === 22)
+                ? 'nd' : (day === 3 || day === 23)
+                ? 'rd' : 'th';
+
+              return (
+                <div className="mt-6 bg-white/10 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md inline-block">
+                  <p className="text-sm uppercase text-neutral-300 tracking-wide mb-1">Next Screening</p>
+                  <p className="text-lg font-semibold">
+                    {weekday}, {month} {day}{suffix} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
+                  </p>
+                </div>
+              );
+            } catch {
+              return (
+                <div className="mt-6 bg-white/10 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md inline-block">
+                  <p className="text-sm uppercase text-neutral-300 tracking-wide mb-1">Next Screening</p>
+                  <p className="text-lg font-semibold">
+                    {firstMovie.date} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
+                  </p>
+                </div>
+              );
+            }
+          })()}
+        </div>
+      </section>
 
       <div className="px-4 py-10 space-y-16">
         <div ref={confirmationRef}></div>
