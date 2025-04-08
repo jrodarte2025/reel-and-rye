@@ -225,13 +225,54 @@ END:VCALENDAR`
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-white dark:bg-gray-900 text-black dark:text-white space-y-12">
-      <header className="relative w-full aspect-video bg-cover bg-center">
-        <div className="absolute inset-0 bg-black bg-opacity-40" />
-        <div
-          className="relative w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: 'url(/banner-imagev3.png)' }}
-        ></div>
-      </header>
+      <section className="relative w-full min-h-[60vh] bg-gradient-to-br from-neutral-950 to-neutral-900 text-white px-6 py-20 flex flex-col justify-center items-center text-center">
+        <div className="mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">Reels & Rye</h1>
+          <p className="text-lg sm:text-xl text-neutral-400 mt-4 max-w-md mx-auto">
+            Movies. Bourbon. Brotherhood.
+          </p>
+        </div>
+
+        <div className="mt-6 bg-white/5 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md">
+          <p className="text-sm uppercase text-neutral-400 tracking-wide mb-1">Next Screening</p>
+          {movies.length > 0 && (() => {
+            const firstMovie = movies[0];
+            try {
+              const [timePart, modifier] = firstMovie.time.split(' ');
+              const hour = parseInt(timePart, 10);
+              const adjustedHour = (modifier === 'PM' && hour !== 12)
+                ? hour + 12
+                : (modifier === 'AM' && hour === 12 ? 0 : hour);
+              const formattedHour = adjustedHour.toString().padStart(2, '0');
+              const dateObj = new Date(`${firstMovie.date}T${formattedHour}:00:00`);
+ 
+              const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+              const month = dateObj.toLocaleDateString('en-US', { month: 'long' });
+              const day = dateObj.getDate();
+              const suffix = (day === 1 || day === 21 || day === 31)
+                ? 'st' : (day === 2 || day === 22)
+                ? 'nd' : (day === 3 || day === 23)
+                ? 'rd' : 'th';
+ 
+              return (
+                <p className="text-lg font-semibold">
+                  {weekday}, {month} {day}{suffix} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
+                </p>
+              );
+            } catch {
+              return (
+                <p className="text-lg font-semibold">
+                  {firstMovie.date} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
+                </p>
+              );
+            }
+          })()}
+        </div>
+
+        <div className="absolute bottom-4 text-xs text-neutral-600">
+          Scroll down to RSVP or recommend a movie
+        </div>
+      </section>
       <section className="text-center px-4 pt-4">
   <h2 className="text-xl font-semibold">Welcome to Movie Night 🍿</h2>
   <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
