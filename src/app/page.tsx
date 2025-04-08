@@ -276,6 +276,9 @@ END:VCALENDAR`
             }
           })()}
         </div>
+        <div className="absolute bottom-4 text-xs text-neutral-400 text-center w-full">
+          ⬇️ Scroll down to RSVP or recommend a movie
+        </div>
       </section>
 
       <div className="px-4 py-10 space-y-16">
