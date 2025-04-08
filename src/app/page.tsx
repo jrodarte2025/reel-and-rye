@@ -1,0 +1,605 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { db } from '../lib/firebase'
+import { collection, getDocs, addDoc, query, where, updateDoc, doc } from 'firebase/firestore'
+
+function getAngerLevel(runtime: number): number {
+  const min = 60
+  const max = 160
+  const clamped = Math.min(Math.max(runtime, min), max)
+  return ((clamped - min) / (max - min)) * 100
+}
+
+function getWifeMood(runtime: number): string {
+  if (runtime <= 100) return '😊'
+  if (runtime <= 120) return '😐'
+  return '😠'
+}
+
+export default function Home() {
+  const [movies, setMovies] = useState<any[]>([])
+  const [rsvps, setRsvps] = useState<Record<string, any[]>>({})
+  const [formData, setFormData] = useState<Record<string, { name: string; email: string; seat: number | null }>>({})
+  const [confirmation, setConfirmation] = useState<string>('')
+  const confirmationRef = useRef<HTMLDivElement>(null)
+  const [showCalendarModal, setShowCalendarModal] = useState(false)
+  const [calendarMovie, setCalendarMovie] = useState<any | null>(null)
+  const [calendarLinks, setCalendarLinks] = useState<{ google: string; ics: string } | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [recommended, setRecommended] = useState<any[]>([])
+  const [voted, setVoted] = useState<string[]>([])
+
+  const handleSearch = async () => {
+    if (searchQuery.length < 2) return
+    const res = await fetch(`/api/searchMovie?query=${encodeURIComponent(searchQuery)}`)
+    const data = await res.json()
+    setSearchResults(data)
+  }
+
+  const handleRecommend = async (movie: any) => {
+    const ref = collection(db, 'recommendedMovies')
+    const snapshot = await getDocs(query(ref, where('tmdbId', '==', movie.id)))
+    if (snapshot.empty) {
+      await addDoc(ref, {
+        title: movie.title,
+        tmdbId: movie.id,
+        votes: 1,
+        timestamp: new Date(),
+      })
+    } else {
+      setConfirmation(`${movie.title} has already been recommended!`)
+      setTimeout(() => setConfirmation(''), 3000)
+      return
+    }
+    setSearchQuery('')
+    setSearchResults([])
+    setConfirmation(`${movie.title} was recommended! ✅`)
+    setTimeout(() => setConfirmation(''), 3000)
+  }
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setMovies([])
+    const snapshot = await getDocs(collection(db, 'movies'))
+    const data = snapshot.docs.map((doc) => {
+      const movie = doc.data() as { date: string; time: string; [key: string]: any }
+      return { id: doc.id, ...movie }
+    })
+      const parseMovieDateTime = (movie: { date: string; time: string }) => {
+        try {
+          const [timePart, modifier] = movie.time.split(' ')
+          const [rawHour] = timePart.split(':')
+          let hour = parseInt(rawHour)
+          if (modifier === 'PM' && hour !== 12) hour += 12
+          if (modifier === 'AM' && hour === 12) hour = 0
+          const formattedHour = hour.toString().padStart(2, '0')
+          return new Date(`${movie.date}T${formattedHour}:00:00`)
+        } catch {
+          return new Date(0) // fallback if time is invalid
+        }
+      }
+
+      const sorted = data.sort((a, b) =>
+        parseMovieDateTime(a).getTime() - parseMovieDateTime(b).getTime()
+      )
+      setMovies(sorted)
+    }
+    fetchMovies()
+  }, [])
+
+  useEffect(() => {
+    if (movies.length === 0) return
+    const fetchAllRsvps = async () => {
+      const result: Record<string, any[]> = {}
+      await Promise.all(
+        movies.map(async (movie) => {
+          const q = query(collection(db, 'rsvps'), where('movieId', '==', movie.id))
+          const snapshot = await getDocs(q)
+          result[movie.id] = snapshot.docs.map((doc) => doc.data())
+        })
+      )
+      setRsvps(result)
+    }
+    fetchAllRsvps()
+  }, [movies])
+
+  useEffect(() => {
+    if (confirmation.includes("You're in") && confirmationRef.current) {
+      confirmationRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [confirmation])
+
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      const snapshot = await getDocs(collection(db, 'recommendedMovies'))
+      const sorted = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0))
+      setRecommended(sorted)
+    }
+    fetchRecommended()
+  }, [])
+
+  useEffect(() => {
+    const stored = localStorage.getItem('votedMovies')
+    if (stored) {
+      setVoted(JSON.parse(stored))
+    }
+  }, [])
+
+  const handleRSVP = async (movieId: string, e: React.FormEvent) => {
+    e.preventDefault()
+    const { name, email, seat } = formData[movieId] || {}
+    const reservedSeats = (rsvps[movieId] || []).map((r) => r.seat)
+
+    if (!name || !email || seat === null) {
+      setConfirmation('Please complete all fields including seat selection.')
+      setTimeout(() => setConfirmation(''), 4000)
+      return
+    }
+
+    if (reservedSeats.includes(seat)) {
+      setConfirmation(`Oops! Seat ${seat} was just taken. Try another one.`)
+      setTimeout(() => setConfirmation(''), 4000)
+      return
+    }
+
+    try {
+      await addDoc(collection(db, 'rsvps'), {
+        movieId,
+        name,
+        email,
+        seat,
+        timestamp: new Date(),
+      })
+
+      const selectedMovie = movies.find((m) => m.id === movieId)
+      if (selectedMovie) {
+        console.log('Selected movie for calendar:', selectedMovie)
+        if (!selectedMovie.date || !selectedMovie.time) {
+          throw new Error("Missing date or time for this movie.")
+        }
+        // Convert "7 PM" or "7:00 PM" to 24-hour time
+        const [rawHour, modifier] = selectedMovie.time.split(' ')
+        let hour = parseInt(rawHour)
+        if (modifier === 'PM' && hour !== 12) hour += 12
+        if (modifier === 'AM' && hour === 12) hour = 0
+        const formattedHour = hour.toString().padStart(2, '0')
+        
+        const startDateTime = new Date(`${selectedMovie.date}T${formattedHour}:00:00`)
+        const endDateTime = new Date(startDateTime.getTime() + 3 * 60 * 60 * 1000) // 3 hours
+
+        const formatForCalendar = (date: Date) =>
+          date.toISOString().replace(/-|:|\.\d{3}/g, '').slice(0, 15) + 'Z'
+
+        const formattedStart = formatForCalendar(startDateTime)
+        const formattedEnd = formatForCalendar(endDateTime)
+
+        const title = `${selectedMovie.title} - Rodarte Reels & Ryes`
+        const location = "6760 Woodland Reserve Ct. Cincinnati, OH 45243"
+        const details = encodeURIComponent("Join us for movies, bourbon, and bonding.")
+
+        const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+          title
+        )}&dates=${formattedStart}/${formattedEnd}&details=${details}&location=${encodeURIComponent(
+          location
+        )}&sf=true&output=xml`
+
+        const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:${title}
+DTSTART:${formattedStart}
+DTEND:${formattedEnd}
+DESCRIPTION:Join us for movies, bourbon, and bonding.
+LOCATION:${location}
+END:VEVENT
+END:VCALENDAR`
+
+        const icsBlob = new Blob([icsContent], { type: 'text/calendar' })
+        const icsUrl = URL.createObjectURL(icsBlob)
+
+        setCalendarMovie(selectedMovie)
+        setCalendarLinks({ google: googleUrl, ics: icsUrl })
+        setShowCalendarModal(true)
+      }
+
+      setRsvps((prev) => ({
+        ...prev,
+        [movieId]: [...(prev[movieId] || []), { name, seat }],
+      }))
+      setFormData((prev) => ({
+        ...prev,
+        [movieId]: { name: '', email: '', seat: null },
+      }))
+      setConfirmation(`You're in for ${name}! 🎉`)
+      setTimeout(() => setConfirmation(''), 4000)
+    } catch (err: any) {
+      console.error('RSVP error:', err?.message || err)
+      setConfirmation(`Something went wrong: ${err?.message || 'unknown error'}`)
+      setTimeout(() => setConfirmation(''), 4000)
+    }
+  }
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-white dark:bg-gray-900 text-black dark:text-white space-y-12">
+      <header className="relative w-full aspect-video bg-cover bg-center">
+        <div className="absolute inset-0 bg-black bg-opacity-40" />
+        <div
+          className="relative w-full h-full bg-cover bg-center"
+          style={{ backgroundImage: 'url(/banner-imagev3.png)' }}
+        ></div>
+      </header>
+      <section className="text-center px-4 pt-4">
+  <h2 className="text-xl font-semibold">Welcome to Movie Night 🍿</h2>
+  <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+    Choose a film, claim your seat, and sip on something special.
+  </p>
+</section>
+
+      <div className="px-4 py-10 space-y-16">
+        <div ref={confirmationRef}></div>
+
+        {confirmation && (
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 dark:bg-green-500">
+            {confirmation}
+          </div>
+        )}
+
+        {movies.length === 0 ? (
+          <p className="text-center text-gray-400 italic animate-pulse dark:text-gray-500">
+            Loading movie magic…
+          </p>
+        ) : (
+          movies.map((movie) => {
+            const reservedSeats = (rsvps[movie.id] || []).map((r) => r.seat)
+            const allSeatsTaken = [1, 2, 3, 4, 5].every(seat => reservedSeats.includes(seat))
+            const angerLevel = getAngerLevel(movie.runtime)
+
+            return (
+              <div
+                key={movie.id}
+                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start rounded-lg shadow-lg transform transition hover:scale-[1.01] hover:shadow-xl"
+              >
+                <section className="p-6">
+                  <h2 className="text-3xl font-bold mb-1 tracking-tight">{movie.title}</h2>
+                  <div className="inline-block bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 text-sm font-semibold px-3 py-1 rounded-full mb-3">
+  🥃 Sip of the Night: {movie.pairing}
+</div>
+                  {(() => {
+                    try {
+                      const [timePart, modifier] = movie.time.split(' ')
+                      const hour = parseInt(timePart, 10)
+                      if (isNaN(hour) || !movie.date || !modifier) throw new Error("Invalid time format")
+ 
+                      const adjustedHour = (modifier === 'PM' && hour !== 12)
+                        ? hour + 12
+                        : (modifier === 'AM' && hour === 12 ? 0 : hour)
+ 
+                      const formattedHour = adjustedHour.toString().padStart(2, '0')
+                      const fullDate = new Date(`${movie.date}T${formattedHour}:00:00`)
+ 
+                      const weekday = fullDate.toLocaleDateString('en-US', { weekday: 'long' })
+                      const month = fullDate.toLocaleDateString('en-US', { month: 'long' })
+                      const day = fullDate.getDate()
+                      const suffix = (day === 1 || day === 21 || day === 31)
+                        ? 'st' : (day === 2 || day === 22)
+                        ? 'nd' : (day === 3 || day === 23)
+                        ? 'rd' : 'th'
+ 
+                      return (
+                        <p className="text-gray-500 dark:text-gray-400 mb-2">
+                          🗓️ {weekday}, {month} {day}{suffix} at {movie.time}
+                        </p>
+                      )
+                    } catch {
+                      return (
+                        <p className="text-gray-500 dark:text-gray-400 mb-2">
+                          🗓️ {movie.date} at {movie.time}
+                        </p>
+                      )
+                    }
+                  })()}
+                  <img
+                    src={movie.poster}
+                    alt={movie.title}
+                    className="w-full max-w-[240px] mx-auto rounded shadow mb-4"
+                  />
+                  <p className="mb-2 leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">🎭 {movie.genre}</p>
+                  <a
+                    href={movie.imdb}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-sm dark:text-blue-400"
+                  >
+                    Watch trailer →
+                  </a>
+                  <p className="text-gray-500 dark:text-gray-400 mt-3">Runtime: {movie.runtime} min</p>
+                  <div className="flex items-center mt-2">
+                    <span className="mr-2 text-sm">Angry Wife Meter:</span>
+                    <div className="relative w-48 h-2 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden" title="Estimated household tension">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${angerLevel}%`,
+                          background: `linear-gradient(to right, #fecaca, #f87171, #b91c1c)`
+                        }}
+                      ></div>
+                    </div>
+                    <span className={`ml-2 text-xl ${angerLevel === 100 ? 'animate-pulse' : ''}`}>{getWifeMood(movie.runtime)}</span>
+                  </div>
+                </section>
+
+                <section className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                  <h3 className="text-xl font-semibold mb-4">Reserve Your Seat</h3>
+                  {allSeatsTaken ? (
+                    <div className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 p-6 rounded-lg text-center">
+                      🎟️ This screening is full! Try again next month.
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex flex-wrap justify-center gap-3 mb-4">
+                        {[1, 2, 3, 4, 5].map((seat) => {
+                          const isHostSeat = seat === 1
+                          const taken = isHostSeat || reservedSeats.includes(seat)
+                          const guest = isHostSeat ? "Jim" : rsvps[movie.id]?.find((r) => r.seat === seat)?.name
+                          const selected = formData[movie.id]?.seat === seat
+                          return (
+                            <div key={seat} className="text-center group relative">
+                              <button
+                                title={taken ? `Taken by ${guest}` : `Select Seat ${seat}`}
+                                disabled={taken}
+                                onClick={() => {
+                                  setFormData({
+                                    [movie.id]: {
+                                      ...(formData[movie.id] || { name: '', email: '', seat: null }),
+                                      seat,
+                                    },
+                                  })
+                                  setConfirmation(`Seat ${seat} selected!`)
+                                  setTimeout(() => setConfirmation(''), 2000)
+                                }}
+                                className={`w-12 h-12 flex items-center justify-center transition transform hover:scale-110 rounded-md ${
+                                  taken
+                                    ? 'bg-gray-400 text-white cursor-not-allowed dark:bg-gray-700'
+                                    : selected
+                                    ? 'bg-red-600 text-white ring-2 ring-offset-2 ring-red-400 animate-pulse cursor-pointer'
+                                    : 'bg-white border border-gray-400 text-black hover:bg-red-100 dark:bg-gray-700 dark:border-gray-500 dark:text-white dark:hover:bg-red-900 cursor-pointer'
+                                }`}
+                              >
+                              {taken ? (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="currentColor"
+                                  viewBox="0 0 24 24"
+                                  className="w-6 h-6"
+                                >
+                                  <path d="M5 3h14l-1 5v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V8L5 3zm2.17 5l.6 3h8.46l.6-3H7.17zm.83 5v5h8v-5H8z" />
+                                </svg>
+                              ) : (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="currentColor"
+                                  viewBox="0 0 24 24"
+                                  className="w-6 h-6"
+                                >
+                                  <path d="M4 10c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v3H4v-3z" />
+                                  <path d="M2 16h20v2H2z" />
+                                  <path d="M7 10v-2h10v2H7z" />
+                                </svg>
+                              )}
+                              </button>
+                              {taken ? (
+                                <div className="text-[10px] text-gray-500 leading-tight text-center mt-1">
+                                  <p className="font-medium">Reserved</p>
+                                  {guest && <p className="italic">{guest}</p>}
+                                </div>
+                              ) : (
+                                <p className="text-xs mt-1 text-center text-gray-600 dark:text-gray-300 font-medium">{seat}</p>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      {formData[movie.id]?.seat !== null && (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                          Fill out the form below to reserve Seat {formData[movie.id]?.seat}.
+                        </p>
+                      )}
+
+                      {formData[movie.id]?.seat !== null && (
+                        <form onSubmit={(e) => handleRSVP(movie.id, e)} className="space-y-4 mt-4">
+                          <input
+                            type="text"
+                            placeholder="Name"
+                            value={formData[movie.id]?.name || ''}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                [movie.id]: {
+                                  ...(prev[movie.id] || { seat: null, email: '' }),
+                                  name: e.target.value,
+                                },
+                              }))
+                            }
+                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md"
+                            required
+                          />
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={formData[movie.id]?.email || ''}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                [movie.id]: {
+                                  ...(prev[movie.id] || { seat: null, name: '' }),
+                                  email: e.target.value,
+                                },
+                              }))
+                            }
+                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md"
+                            required
+                          />
+                          <button
+                            type="submit"
+                            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-900 transition dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                          >
+                            🎟️ Save My Spot
+                          </button>
+                        </form>
+                      )}
+                    </>
+                  )}
+                </section>
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      {showCalendarModal && calendarMovie && calendarLinks && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowCalendarModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-md text-center space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-semibold">📅 Add to Your Calendar</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Would you like to add <strong>{calendarMovie.title}</strong> to your calendar?
+            </p>
+            <div className="flex justify-center gap-4">
+              <a
+                href={calendarLinks.google}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              >
+                Google Calendar
+              </a>
+              <a
+                href={calendarLinks.ics}
+                download={`${calendarMovie.title}-Rodarte.ics`}
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+              >
+                iCalendar / Outlook
+              </a>
+            </div>
+            <button
+              onClick={() => setShowCalendarModal(false)}
+              className="text-sm text-gray-500 hover:underline mt-2"
+            >
+              No thanks
+            </button>
+          </div>
+        </div>
+      )}
+    <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
+      <h3 className="text-lg font-semibold mb-2 text-center">
+        🎬 Not seeing something you like? Recommend our next movie.
+      </h3>
+      <div className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4">
+        <input
+          type="text"
+          placeholder="Search for a movie"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800"
+        />
+        <button
+          onClick={handleSearch}
+          className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+        >
+          Search
+        </button>
+      </div>
+      {searchResults.length > 0 && (
+        <ul className="space-y-2 max-w-md mx-auto">
+          {searchResults.map((movie: any) => (
+            <li
+              key={movie.id}
+              className="flex items-center gap-4 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg"
+            >
+              {movie.poster && (
+                <img
+                  src={movie.poster}
+                  alt={`Poster for ${movie.title}`}
+                  className="w-10 h-14 object-cover rounded shadow"
+                />
+              )}
+              <div className="flex-1 text-sm text-gray-800 dark:text-white">
+                <p className="font-medium">{movie.title}</p>
+                <button
+                  className="mt-1 text-xs bg-emerald-600 text-white px-2 py-1 rounded hover:bg-emerald-700"
+                  onClick={() => handleRecommend(movie)}
+                >
+                  Recommend
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    {recommended.length > 0 && (
+        <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm mt-12">
+        <h3 className="text-lg font-semibold mb-4 text-center">
+          📢 Top Recommended Movies
+        </h3>
+        <ul className="space-y-2 text-left">
+          {recommended.map((movie: any) => (
+            <li
+              key={movie.id}
+              className="flex justify-between items-center bg-white dark:bg-gray-800 px-4 py-2 rounded shadow"
+            >
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{movie.title}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    const ref = doc(db, 'recommendedMovies', movie.id)
+                    await updateDoc(ref, { votes: (movie.votes || 0) + 1 })
+const snapshot = await getDocs(collection(db, 'recommendedMovies'))
+const sorted = snapshot.docs
+  .map(doc => ({ id: doc.id, ...doc.data() }))
+  .sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0))
+setRecommended(sorted)
+                  }}
+                  className="text-green-600 hover:text-green-800"
+                  title="Upvote"
+                >
+                  👍
+                </button>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {movie.votes || 0}
+                </span>
+                <button
+                  onClick={async () => {
+                    const ref = doc(db, 'recommendedMovies', movie.id)
+                    await updateDoc(ref, { votes: (movie.votes || 0) - 1 })
+                    const updated = recommended.map((m: any) =>
+                      m.id === movie.id ? { ...m, votes: (m.votes || 0) - 1 } : m
+                    )
+                    setRecommended(updated.sort((a, b) => (b.votes || 0) - (a.votes || 0)))
+                  }}
+                  className="text-red-600 hover:text-red-800"
+                  title="Downvote"
+                >
+                  👎
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </main>
+  )
+}
