@@ -350,8 +350,11 @@ END:VCALENDAR`
                     alt={movie.title}
                     className="w-full max-w-[240px] mx-auto rounded shadow mb-4"
                   />
-                  <p className="mb-2 leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">🎭 {movie.genre}</p>
+                  <div className="space-y-3">
+                    <p className="mb-2 leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
+                    <p className="text-gray-500 dark:text-gray-400">Runtime: {movie.runtime} min</p>
+                  </div>
                   <a
                     href={movie.imdb}
                     target="_blank"
@@ -360,7 +363,6 @@ END:VCALENDAR`
                   >
                     Watch trailer →
                   </a>
-                  <p className="text-gray-500 dark:text-gray-400 mt-3">Runtime: {movie.runtime} min</p>
                   <div className="flex items-center mt-2">
                     <span className="mr-2 text-sm">Angry Wife Meter:</span>
                     <div className="relative w-48 h-2 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden" title="Estimated household tension">
