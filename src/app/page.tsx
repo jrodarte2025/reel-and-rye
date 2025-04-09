@@ -404,8 +404,16 @@ END:VCALENDAR`
                                     },
                                   })
                                   setConfirmation(`Seat ${seat} selected!`)
-                                  setTimeout(() => setConfirmation(''), 2000)
-                                }}
+                              setTimeout(() => setConfirmation(''), 2000)
+  
+                              setTimeout(() => {
+                                const input = document.querySelector(`#name-${movie.id}`) as HTMLInputElement | null
+                                if (input) {
+                                  input.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                  input.focus()
+                                }
+                              }, 250)
+                            }}
                               className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md transition duration-200 ease-in-out ${
                                   taken
                                     ? 'bg-gray-300 text-white cursor-not-allowed dark:bg-gray-700'
@@ -456,6 +464,7 @@ END:VCALENDAR`
                       {formData[movie.id]?.seat !== null && (
                         <form onSubmit={(e) => handleRSVP(movie.id, e)} className="space-y-4 mt-4">
                           <input
+                            id={`name-${movie.id}`}
                             type="text"
                             placeholder="Name"
                             value={formData[movie.id]?.name || ''}
