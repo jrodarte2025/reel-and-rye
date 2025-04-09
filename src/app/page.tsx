@@ -226,15 +226,15 @@ END:VCALENDAR`
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-white dark:bg-gray-900 text-black dark:text-white space-y-12">
-<section className="relative w-full min-h-[60vh] px-6 py-16 flex items-center justify-center rounded-xl overflow-hidden shadow-xl bg-gradient-to-br from-neutral-900 to-neutral-800">
+      <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-neutral-950 to-neutral-900">
         <img
           src="/banner-overlay.png"
           alt=""
           className="absolute inset-0 w-full h-full object-cover opacity-50 pointer-events-none"
         />
-        <div className="relative z-10 text-center">
+        <div className="relative z-10 text-center text-white">
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight font-serif mb-4">Reels & Rye</h1>
-          <p className="text-lg sm:text-xl text-gray-300 max-w-md mx-auto">
+          <p className="text-lg sm:text-xl text-neutral-300 max-w-md mx-auto">
             Movies. Bourbon. Brotherhood.
           </p>
 
@@ -258,7 +258,7 @@ END:VCALENDAR`
                 ? 'rd' : 'th';
 
               return (
-                <div className="mt-4 bg-white/10 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md inline-block">
+                <div className="mt-6 bg-white/10 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md inline-block">
                   <p className="text-sm uppercase text-neutral-300 tracking-wide mb-1">Next Screening</p>
                   <p className="text-lg font-semibold">
                     {weekday}, {month} {day}{suffix} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
@@ -277,7 +277,9 @@ END:VCALENDAR`
             }
           })()}
         </div>
-        <div className="absolute bottom-6 text-neutral-400 animate-bounce text-xl">⬇️</div>
+        <div className="absolute bottom-4 text-xs text-neutral-400 text-center w-full">
+          ⬇️ Scroll down to RSVP or recommend a movie
+        </div>
       </section>
 
       <div className="px-4 py-10 space-y-16">
