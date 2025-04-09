@@ -386,7 +386,7 @@ END:VCALENDAR`
                     </div>
                   ) : (
                     <>
-                      <div className="grid grid-cols-5 gap-6 justify-center mb-6 max-w-md mx-auto">
+                      <div className="grid grid-cols-3 grid-rows-2 sm:grid-cols-5 gap-6 justify-center mb-6 max-w-md mx-auto">
                         {[1, 2, 3, 4, 5].map((seat) => {
                           const isHostSeat = seat === 1
                           const taken = isHostSeat || reservedSeats.includes(seat)
@@ -410,7 +410,7 @@ END:VCALENDAR`
                                   taken
                                     ? 'bg-gray-300 text-white cursor-not-allowed dark:bg-gray-700'
                                     : selected
-                                    ? 'bg-amber-500 text-white ring-2 ring-offset-2 ring-red-400 animate-pulse'
+                                  ? 'bg-amber-500 text-white ring-2 ring-offset-2 ring-amber-300 animate-pulse'
                                     : 'bg-white hover:bg-amber-100 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-amber-900'
                                 }`}
                               >
