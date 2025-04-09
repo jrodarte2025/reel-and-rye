@@ -605,7 +605,10 @@ END:VCALENDAR`
             >
               <span className="text-sm font-medium text-gray-900 dark:text-white">{movie.title}</span>
                 {scheduledTitles.has(movie.title) ? (
-                  <span className="text-sm text-green-600 font-medium">Scheduled</span>
+                  <>
+                    <div className="w-20 text-sm text-green-600 font-medium text-center">Scheduled</div>
+                    <div className="w-20"></div>
+                  </>
                 ) : (
                   <>
                     <button
