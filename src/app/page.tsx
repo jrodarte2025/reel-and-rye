@@ -386,7 +386,7 @@ END:VCALENDAR`
                     </div>
                   ) : (
                     <>
-                      <div className="flex flex-wrap justify-center gap-3 mb-4">
+                      <div className="grid grid-cols-3 gap-4 justify-items-center mb-4 sm:grid-cols-5 max-w-sm mx-auto">
                         {[1, 2, 3, 4, 5].map((seat) => {
                           const isHostSeat = seat === 1
                           const taken = isHostSeat || reservedSeats.includes(seat)
@@ -395,7 +395,6 @@ END:VCALENDAR`
                           return (
                             <div key={seat} className="text-center group relative">
                               <button
-                                title={taken ? `Taken by ${guest}` : `Select Seat ${seat}`}
                                 disabled={taken}
                                 onClick={() => {
                                   setFormData({
@@ -407,12 +406,12 @@ END:VCALENDAR`
                                   setConfirmation(`Seat ${seat} selected!`)
                                   setTimeout(() => setConfirmation(''), 2000)
                                 }}
-                                className={`w-12 h-12 flex items-center justify-center transition transform hover:scale-110 rounded-md ${
+                                className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition transform rounded-xl font-bold text-lg ${
                                   taken
                                     ? 'bg-gray-400 text-white cursor-not-allowed dark:bg-gray-700'
                                     : selected
-                                    ? 'bg-red-600 text-white ring-2 ring-offset-2 ring-red-400 animate-pulse cursor-pointer'
-                                    : 'bg-white border border-gray-400 text-black hover:bg-red-100 dark:bg-gray-700 dark:border-gray-500 dark:text-white dark:hover:bg-red-900 cursor-pointer'
+                                    ? 'bg-red-600 text-white ring-2 ring-offset-2 ring-red-400 animate-pulse'
+                                    : 'bg-white border border-gray-300 text-black hover:bg-red-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-red-900 cursor-pointer'
                                 }`}
                               >
                               {taken ? (
@@ -438,12 +437,9 @@ END:VCALENDAR`
                               )}
                               </button>
                               {taken ? (
-                                <div className="text-[10px] text-gray-500 leading-tight text-center mt-1">
-                                  <p className="font-medium">Reserved</p>
-                                  {guest && <p className="italic">{guest}</p>}
-                                </div>
+                                <p className="text-xs mt-2 text-gray-500 dark:text-gray-400 italic">Reserved</p>
                               ) : (
-                                <p className="text-xs mt-1 text-center text-gray-600 dark:text-gray-300 font-medium">{seat}</p>
+                                <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">{seat}</p>
                               )}
                             </div>
                           )
