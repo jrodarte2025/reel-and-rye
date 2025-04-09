@@ -352,7 +352,9 @@ END:VCALENDAR`
                   />
                   <div className="space-y-3">
                     <details className="mb-2">
-                      <summary className="cursor-pointer text-sm text-amber-600 hover:underline">Synopsis</summary>
+                      <summary className="cursor-pointer text-sm font-semibold text-amber-700 bg-amber-100 dark:bg-amber-900 px-4 py-2 rounded-md shadow hover:bg-amber-200 dark:hover:bg-amber-800 transition">
+                        About this Movie
+                      </summary>
                       <p className="mt-2 leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
                     </details>
                     <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
