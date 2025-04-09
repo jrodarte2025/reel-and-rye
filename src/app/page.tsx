@@ -351,7 +351,10 @@ END:VCALENDAR`
                     className="w-full max-w-[240px] mx-auto rounded shadow mb-4"
                   />
                   <div className="space-y-3">
-                    <p className="mb-2 leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
+                    <details className="mb-2">
+                      <summary className="cursor-pointer text-sm text-amber-600 hover:underline">Synopsis</summary>
+                      <p className="mt-2 leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
+                    </details>
                     <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
                     <p className="text-gray-500 dark:text-gray-400">Runtime: {movie.runtime} min</p>
                   </div>
