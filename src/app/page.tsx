@@ -436,10 +436,11 @@ END:VCALENDAR`
                                 </svg>
                               )}
                               </button>
-                              {taken ? (
-                                <p className="text-xs mt-2 text-gray-500 dark:text-gray-400 italic">Reserved</p>
-                              ) : (
+                              {!taken && (
                                 <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">{seat}</p>
+                              )}
+                              {taken && guest && (
+                                <p className="text-xs text-neutral-400 text-center mt-1">{guest.split(' ')[0]}</p>
                               )}
                             </div>
                           )
