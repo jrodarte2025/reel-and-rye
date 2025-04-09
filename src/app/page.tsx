@@ -229,7 +229,7 @@ END:VCALENDAR`
         <img
           src="/banner-overlay.png"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-50 pointer-events-none"
         />
         <div className="relative z-10 text-center text-white">
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight font-serif mb-4">Reels & Rye</h1>
