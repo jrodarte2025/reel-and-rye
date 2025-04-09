@@ -611,38 +611,50 @@ END:VCALENDAR`
                   </>
                 ) : (
                   <>
-                    <button
-                      onClick={async () => {
-                        const ref = doc(db, 'recommendedMovies', movie.id)
-                        await updateDoc(ref, { votes: (movie.votes || 0) + 1 })
-                        const snapshot = await getDocs(collection(db, 'recommendedMovies'))
-                        const sorted = snapshot.docs
-                          .map(doc => ({ id: doc.id, ...doc.data() }))
-                          .sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0))
-                        setRecommended(sorted)
-                      }}
-                      className="text-green-600 hover:text-green-800"
-                      title="Upvote"
-                    >
-                      👍
-                    </button>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      {movie.votes || 0}
-                    </span>
-                    <button
-                      onClick={async () => {
-                        const ref = doc(db, 'recommendedMovies', movie.id)
-                        await updateDoc(ref, { votes: (movie.votes || 0) - 1 })
-                        const updated = recommended.map((m: any) =>
-                          m.id === movie.id ? { ...m, votes: (m.votes || 0) - 1 } : m
-                        )
-                        setRecommended(updated.sort((a, b) => (b.votes || 0) - (a.votes || 0)))
-                      }}
-                      className="text-red-600 hover:text-red-800"
-                      title="Downvote"
-                    >
-                      👎
-                    </button>
+                    <div className="flex justify-end gap-4 items-center min-w-[120px]">
+                      <button
+                        onClick={async () => {
+                          const ref = doc(db, 'recommendedMovies', movie.id)
+                          await updateDoc(ref, { votes: (movie.votes || 0) + 1 })
+                          const snapshot = await getDocs(collection(db, 'recommendedMovies'))
+                          const sorted = snapshot.docs
+                            .map(doc => ({ id: doc.id, ...doc.data() }))
+                            .sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0))
+                          setRecommended(sorted)
+                        }}
+                        disabled={voted.includes(movie.id)}
+                        title={voted.includes(movie.id) ? "Thanks for voting!" : "Upvote"}
+                        className={`transition-opacity duration-300 ${
+                          voted.includes(movie.id)
+                            ? 'opacity-40 cursor-not-allowed'
+                            : 'text-green-600 hover:text-green-800'
+                        }`}
+                      >
+                        👍
+                      </button>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        {movie.votes || 0}
+                      </span>
+                      <button
+                        onClick={async () => {
+                          const ref = doc(db, 'recommendedMovies', movie.id)
+                          await updateDoc(ref, { votes: (movie.votes || 0) - 1 })
+                          const updated = recommended.map((m: any) =>
+                            m.id === movie.id ? { ...m, votes: (m.votes || 0) - 1 } : m
+                          )
+                          setRecommended(updated.sort((a, b) => (b.votes || 0) - (a.votes || 0)))
+                        }}
+                        disabled={voted.includes(movie.id)}
+                        title={voted.includes(movie.id) ? "Thanks for voting!" : "Downvote"}
+                        className={`transition-opacity duration-300 ${
+                          voted.includes(movie.id)
+                            ? 'opacity-40 cursor-not-allowed'
+                            : 'text-red-600 hover:text-red-800'
+                        }`}
+                      >
+                        👎
+                      </button>
+                    </div>
                   </>
                 )}
             </li>
