@@ -355,19 +355,22 @@ END:VCALENDAR`
                       <summary className="cursor-pointer text-sm font-semibold text-amber-700 bg-amber-100 dark:bg-amber-900 px-4 py-2 rounded-md shadow hover:bg-amber-200 dark:hover:bg-amber-800 transition">
                         About this Movie
                       </summary>
-                      <p className="mt-2 leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
+                      <div className="mt-2 space-y-3">
+                        <p className="leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
+                        <hr className="border-gray-300 dark:border-gray-600" />
+                        <a
+                          href={movie.imdb}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline pl-1 dark:text-blue-400"
+                        >
+                          🎥 Watch trailer →
+                        </a>
+                      </div>
                     </details>
                     <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
                     <p className="text-gray-500 dark:text-gray-400">Runtime: {movie.runtime} min</p>
                   </div>
-                  <a
-                    href={movie.imdb}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline text-sm dark:text-blue-400"
-                  >
-                    Watch trailer →
-                  </a>
                   <div className="flex items-center mt-2">
                     <span className="mr-2 text-sm">Angry Wife Meter:</span>
                     <div className="relative w-48 h-2 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden" title="Estimated household tension">
