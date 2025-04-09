@@ -406,12 +406,12 @@ END:VCALENDAR`
                                   setConfirmation(`Seat ${seat} selected!`)
                                   setTimeout(() => setConfirmation(''), 2000)
                                 }}
-                                className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition transform rounded-xl font-bold text-lg ${
+                              className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md transition transform duration-200 ease-out ${
                                   taken
-                                    ? 'bg-gray-400 text-white cursor-not-allowed dark:bg-gray-700'
+                                    ? 'bg-gray-300 text-white cursor-not-allowed dark:bg-gray-700'
                                     : selected
-                                    ? 'bg-red-600 text-white ring-2 ring-offset-2 ring-red-400 animate-pulse'
-                                    : 'bg-white border border-gray-300 text-black hover:bg-red-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-red-900 cursor-pointer'
+                                      ? 'bg-red-600 text-white ring-2 ring-offset-2 ring-red-400 scale-105 animate-bounce'
+                                      : 'bg-white hover:bg-red-100 hover:scale-105 active:scale-95 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-red-900'
                                 }`}
                               >
                               {taken ? (
