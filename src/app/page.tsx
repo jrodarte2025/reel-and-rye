@@ -386,7 +386,7 @@ END:VCALENDAR`
                     </div>
                   ) : (
                     <>
-                      <div className="grid grid-cols-3 gap-4 justify-items-center mb-4 sm:grid-cols-5 max-w-sm mx-auto">
+                      <div className="grid grid-cols-5 gap-6 justify-center mb-6 max-w-md mx-auto">
                         {[1, 2, 3, 4, 5].map((seat) => {
                           const isHostSeat = seat === 1
                           const taken = isHostSeat || reservedSeats.includes(seat)
@@ -406,12 +406,12 @@ END:VCALENDAR`
                                   setConfirmation(`Seat ${seat} selected!`)
                                   setTimeout(() => setConfirmation(''), 2000)
                                 }}
-                              className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md transition transform duration-200 ease-out ${
+                              className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md transition duration-200 ease-in-out ${
                                   taken
                                     ? 'bg-gray-300 text-white cursor-not-allowed dark:bg-gray-700'
                                     : selected
-                                      ? 'bg-red-600 text-white ring-2 ring-offset-2 ring-red-400 scale-105 animate-bounce'
-                                      : 'bg-white hover:bg-red-100 hover:scale-105 active:scale-95 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-red-900'
+                                    ? 'bg-amber-500 text-white ring-2 ring-offset-2 ring-red-400 animate-pulse'
+                                    : 'bg-white hover:bg-amber-100 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-amber-900'
                                 }`}
                               >
                               {taken ? (
