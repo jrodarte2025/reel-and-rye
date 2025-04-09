@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { db } from '../lib/firebase'
 import { collection, getDocs, addDoc, query, where, updateDoc, doc } from 'firebase/firestore'
 
@@ -30,6 +30,7 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [recommended, setRecommended] = useState<any[]>([])
   const [voted, setVoted] = useState<string[]>([])
+  const scheduledTitles = useMemo(() => new Set(movies.map((m) => m.title)), [movies])
 
   const handleSearch = async () => {
     if (searchQuery.length < 2) return
@@ -603,40 +604,44 @@ END:VCALENDAR`
               className="flex justify-between items-center bg-white dark:bg-gray-800 px-4 py-2 rounded shadow"
             >
               <span className="text-sm font-medium text-gray-900 dark:text-white">{movie.title}</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={async () => {
-                    const ref = doc(db, 'recommendedMovies', movie.id)
-                    await updateDoc(ref, { votes: (movie.votes || 0) + 1 })
-const snapshot = await getDocs(collection(db, 'recommendedMovies'))
-const sorted = snapshot.docs
-  .map(doc => ({ id: doc.id, ...doc.data() }))
-  .sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0))
-setRecommended(sorted)
-                  }}
-                  className="text-green-600 hover:text-green-800"
-                  title="Upvote"
-                >
-                  👍
-                </button>
-                <span className="text-sm text-gray-600 dark:text-gray-300">
-                  {movie.votes || 0}
-                </span>
-                <button
-                  onClick={async () => {
-                    const ref = doc(db, 'recommendedMovies', movie.id)
-                    await updateDoc(ref, { votes: (movie.votes || 0) - 1 })
-                    const updated = recommended.map((m: any) =>
-                      m.id === movie.id ? { ...m, votes: (m.votes || 0) - 1 } : m
-                    )
-                    setRecommended(updated.sort((a, b) => (b.votes || 0) - (a.votes || 0)))
-                  }}
-                  className="text-red-600 hover:text-red-800"
-                  title="Downvote"
-                >
-                  👎
-                </button>
-              </div>
+                {scheduledTitles.has(movie.title) ? (
+                  <span className="text-sm text-green-600 font-medium">Scheduled</span>
+                ) : (
+                  <>
+                    <button
+                      onClick={async () => {
+                        const ref = doc(db, 'recommendedMovies', movie.id)
+                        await updateDoc(ref, { votes: (movie.votes || 0) + 1 })
+                        const snapshot = await getDocs(collection(db, 'recommendedMovies'))
+                        const sorted = snapshot.docs
+                          .map(doc => ({ id: doc.id, ...doc.data() }))
+                          .sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0))
+                        setRecommended(sorted)
+                      }}
+                      className="text-green-600 hover:text-green-800"
+                      title="Upvote"
+                    >
+                      👍
+                    </button>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {movie.votes || 0}
+                    </span>
+                    <button
+                      onClick={async () => {
+                        const ref = doc(db, 'recommendedMovies', movie.id)
+                        await updateDoc(ref, { votes: (movie.votes || 0) - 1 })
+                        const updated = recommended.map((m: any) =>
+                          m.id === movie.id ? { ...m, votes: (m.votes || 0) - 1 } : m
+                        )
+                        setRecommended(updated.sort((a, b) => (b.votes || 0) - (a.votes || 0)))
+                      }}
+                      className="text-red-600 hover:text-red-800"
+                      title="Downvote"
+                    >
+                      👎
+                    </button>
+                  </>
+                )}
             </li>
           ))}
         </ul>
