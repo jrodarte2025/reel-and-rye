@@ -307,7 +307,7 @@ END:VCALENDAR`
                 className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start rounded-lg shadow-lg transform transition hover:scale-[1.01] hover:shadow-xl"
               >
                 <section className="p-6">
-                  <h2 className="text-3xl font-bold mb-1 tracking-tight">{movie.title}</h2>
+                <h2 className="text-3xl font-serif font-bold mb-1 tracking-tight">{movie.title}</h2>
                   <div className="inline-block bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 text-sm font-semibold px-3 py-1 rounded-full mb-3">
   🥃 Sip of the Night: {movie.pairing}
 </div>
@@ -356,7 +356,7 @@ END:VCALENDAR`
                         About this Movie
                       </summary>
                       <div className="mt-2 space-y-3">
-                        <p className="leading-relaxed text-gray-700 dark:text-gray-300">{movie.synopsis}</p>
+                      <p className="leading-relaxed text-gray-700 dark:text-gray-300 text-balance">{movie.synopsis}</p>
                         <hr className="border-gray-300 dark:border-gray-600" />
                         <a
                           href={movie.imdb}
@@ -364,7 +364,7 @@ END:VCALENDAR`
                           rel="noopener noreferrer"
                           className="text-sm text-blue-600 hover:underline pl-1 dark:text-blue-400"
                         >
-                          🎥 Watch trailer →
+                          🎥 Watch the trailer
                         </a>
                       </div>
                     </details>
@@ -387,7 +387,7 @@ END:VCALENDAR`
                 </section>
 
                 <section className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-                  <h3 className="text-xl font-semibold mb-4">Reserve Your Seat</h3>
+                <h3 className="text-lg sm:text-xl font-semibold font-serif mb-4">Reserve Your Seat</h3>
                   {allSeatsTaken ? (
                     <div className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 p-6 rounded-lg text-center">
                       🎟️ This screening is full! Try again next month.
@@ -422,7 +422,7 @@ END:VCALENDAR`
                                 }
                               }, 250)
                             }}
-                              className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md transition duration-200 ease-in-out ${
+                              className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md hover:scale-105 transform transition duration-200 ease-in-out ${
                                   taken
                                     ? 'bg-gray-300 text-white cursor-not-allowed dark:bg-gray-700'
                                     : selected
