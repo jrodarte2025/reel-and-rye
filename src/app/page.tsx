@@ -230,7 +230,7 @@ END:VCALENDAR`
         <img
           src="/banner-overlay.png"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-50 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-70 pointer-events-none"
         />
         {/* subtle sparkle / film‑grain overlay */}
         <div className="absolute inset-0 bg-[url('/grain.png')] bg-cover opacity-10 pointer-events-none" />
