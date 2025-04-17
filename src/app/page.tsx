@@ -415,7 +415,7 @@ END:VCALENDAR`
                           <rect x="4" y="3" width="16" height="2" rx="1" />
                           <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
                           <rect x="7" y="18" width="10" height="2" rx="1" />
-                          <path className="fill-porcelain" d="M8 12h8v4H8z" /> <!-- bourbon liquid -->
+                          <path className="fill-porcelain" d="M8 12h8v4H8z" /> {/* bourbon liquid */}
                         </svg>
                         <h4 className="text-xl font-semibold mb-1">All seats saved</h4>
                         <p className="text-text-secondary-light max-w-xs">
