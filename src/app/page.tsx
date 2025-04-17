@@ -226,7 +226,7 @@ END:VCALENDAR`
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-white dark:bg-gray-900 text-black dark:text-white space-y-12">
-      <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-neutral-950 to-neutral-900">
+     <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-white dark:bg-gradient-to-br dark:from-neutral-950 dark:to-neutral-900">
         <img
           src="/banner-overlay.png"
           alt=""
@@ -282,11 +282,11 @@ END:VCALENDAR`
         </div>
       </section>
 
-      <div className="px-4 py-10 space-y-16">
+      <div id="rsvp" className="px-4 py-10 space-y-16">
         <div ref={confirmationRef}></div>
 
         {confirmation && (
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 dark:bg-green-500">
+          <div className="fixed top-4 right-4 bg-amber-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 dark:bg-amber-500">
             {confirmation}
           </div>
         )}
@@ -403,7 +403,14 @@ END:VCALENDAR`
                           return (
                             <div key={seat} className="text-center group relative">
                               <button
-                                disabled={taken}
+  disabled={taken}
+  title={
+    isHostSeat
+      ? 'Host seat'
+      : taken
+      ? `Reserved by ${guest || 'guest'}`
+      : `Seat ${seat}`
+  }
                                 onClick={() => {
                                   setFormData({
                                     [movie.id]: {
@@ -430,25 +437,25 @@ END:VCALENDAR`
                                     : 'bg-white hover:bg-amber-100 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-amber-900'
                                 }`}
                               >
-                              {taken ? (
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                  className="w-6 h-6"
-                                >
-                                  <path d="M5 3h14l-1 5v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V8L5 3zm2.17 5l.6 3h8.46l.6-3H7.17zm.83 5v5h8v-5H8z" />
+                              {isHostSeat ? (
+                                /* bourbon glass icon */
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+                                  <path d="M4 3h16v2H4z" />
+                                  <path d="M6 6h12l-1 10H7z" />
+                                  <path d="M7 18h10v2H7z" />
+                                </svg>
+                              ) : taken ? (
+                                /* filled seat icon */
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+                                  <path d="M5 3h14l-1 5v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8l-1-5z" />
+                                  <path d="M8 13h8v5H8z" />
                                 </svg>
                               ) : (
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                  className="w-6 h-6"
-                                >
+                                /* empty seat outline */
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
                                   <path d="M4 10c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v3H4v-3z" />
                                   <path d="M2 16h20v2H2z" />
-                                  <path d="M7 10v-2h10v2H7z" />
+                                  <path d="M7 10V8h10v2H7z" />
                                 </svg>
                               )}
                               </button>
