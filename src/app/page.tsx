@@ -438,15 +438,14 @@ END:VCALENDAR`
                                 }`}
                               >
                               {taken ? (
-                                /* bourbon glass icon for all taken seats (host or reserved) */
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  className="w-6 h-6"
-                                >
-                                  <path d="M5 2h14a1 1 0 0 1 1 1v2a5 5 0 0 1-4 4.9V17a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3V9.9A5 5 0 0 1 4 5V3a1 1 0 0 1 1-1zm2 7v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9H7zm10-2.06A3 3 0 0 0 19 5V4H5v1a3 3 0 0 0 2 2.94V7h10v-.06z" />
-                                </svg>
+                                /* show custom bourbon glass SVG for any taken seat */
+                                // ⚠️ Ensure bourbon-glass.svg is placed in /public so Next.js can serve it
+                                <img
+                                  src="/bourbon-glass.svg"
+                                  alt="Taken seat"
+                                  className="w-6 h-6 object-contain"
+                                  aria-hidden="true"
+                                />
                               ) : (
                                 /* empty seat outline */
                                 <svg
