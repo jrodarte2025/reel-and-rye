@@ -438,16 +438,15 @@ END:VCALENDAR`
                                 }`}
                               >
                               {taken ? (
-                                /* show custom bourbon glass SVG for any taken seat */
-                                // ⚠️ Ensure bourbon-glass.svg is placed in /public so Next.js can serve it
                                 <img
                                   src="/bourbon-glass.svg"
                                   alt="Taken seat"
-                                  className="w-6 h-6 object-contain"
+                                  width={24}
+                                  height={24}
+                                  className="object-contain"
                                   aria-hidden="true"
                                 />
                               ) : (
-                                /* empty seat outline */
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   viewBox="0 0 24 24"
