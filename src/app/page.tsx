@@ -261,7 +261,7 @@ END:VCALENDAR`
 
               return (
                 <div className="mt-6 bg-white/10 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md inline-block">
-                  <p className="text-sm uppercase text-neutral-300 tracking-wide mb-1">Next Screening</p>
+                  <p className="text-sm uppercase text-text-secondary-light tracking-wide mb-1">Next Screening</p>
                   <p className="text-lg font-semibold">
                     {weekday}, {month} {day}{suffix} at {firstMovie.time} – <span className="text-amber-300">{firstMovie.title}</span>
                   </p>
@@ -288,7 +288,7 @@ END:VCALENDAR`
         <div ref={confirmationRef}></div>
 
         {confirmation && (
-          <div className="fixed top-4 right-4 bg-bourbon text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 dark:bg-leather dark:text-charcoal">
+          <div className="fixed top-4 right-4 bg-bourbon text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 dark:bg-leather dark:text-porcelain">
             {confirmation}
           </div>
         )}
@@ -434,8 +434,8 @@ END:VCALENDAR`
                               className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md hover:scale-105 transform transition duration-200 ease-in-out ${
                                   taken
                                     ? 'bg-gray-300 text-white cursor-not-allowed dark:bg-gray-700'
-                                    : selected
-                                  ? 'bg-amber-500 text-white ring-2 ring-offset-2 ring-amber-300 animate-pulse'
+                              : selected
+                                  ? 'bg-bourbon text-porcelain ring-2 ring-offset-2 ring-bourbon/30 animate-pulse'
                                     : 'bg-white hover:bg-amber-100 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-amber-900'
                                 }`}
                               >
@@ -470,63 +470,74 @@ END:VCALENDAR`
                                 <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">{seat}</p>
                               )}
                               {taken && guest && (
-                                <p className="text-xs text-neutral-400 text-center mt-1">{guest.split(' ')[0]}</p>
+                                <p className="text-xs text-text-secondary-light text-center mt-1">{guest.split(' ')[0]}</p>
                               )}
                             </div>
                           )
                         })}
                       </div>
+                      <form
+  onSubmit={(e) => handleRSVP(movie.id, e)}
+  className="space-y-4 mt-4"
+>
+  <input
+    id={`name-${movie.id}`}
+    type="text"
+    placeholder="Name (select a seat first)"
+    value={formData[movie.id]?.name || ''}
+    disabled={formData[movie.id]?.seat === null}
+    onChange={(e) =>
+      setFormData((prev) => ({
+        ...prev,
+        [movie.id]: {
+          ...(prev[movie.id] || { seat: null, email: '' }),
+          name: e.target.value,
+        },
+      }))
+    }
+    className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md ${
+      formData[movie.id]?.seat === null
+        ? 'opacity-40 cursor-not-allowed dark:bg-gray-800'
+        : 'dark:bg-gray-700'
+    }`}
+    required
+  />
+  <input
+    type="email"
+    placeholder="Email (select a seat first)"
+    value={formData[movie.id]?.email || ''}
+    disabled={formData[movie.id]?.seat === null}
+    onChange={(e) =>
+      setFormData((prev) => ({
+        ...prev,
+        [movie.id]: {
+          ...(prev[movie.id] || { seat: null, name: '' }),
+          email: e.target.value,
+        },
+      }))
+    }
+    className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md ${
+      formData[movie.id]?.seat === null
+        ? 'opacity-40 cursor-not-allowed dark:bg-gray-800'
+        : 'dark:bg-gray-700'
+    }`}
+    required
+  />
 
-                      {formData[movie.id]?.seat !== null && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                          Fill out the form below to reserve Seat {formData[movie.id]?.seat}.
-                        </p>
-                      )}
-
-                      {formData[movie.id]?.seat !== null && (
-                        <form onSubmit={(e) => handleRSVP(movie.id, e)} className="space-y-4 mt-4">
-                          <input
-                            id={`name-${movie.id}`}
-                            type="text"
-                            placeholder="Name"
-                            value={formData[movie.id]?.name || ''}
-                            onChange={(e) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                [movie.id]: {
-                                  ...(prev[movie.id] || { seat: null, email: '' }),
-                                  name: e.target.value,
-                                },
-                              }))
-                            }
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md"
-                            required
-                          />
-                          <input
-                            type="email"
-                            placeholder="Email"
-                            value={formData[movie.id]?.email || ''}
-                            onChange={(e) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                [movie.id]: {
-                                  ...(prev[movie.id] || { seat: null, name: '' }),
-                                  email: e.target.value,
-                                },
-                              }))
-                            }
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md"
-                            required
-                          />
-                          <button
-                            type="submit"
-                          className="w-full bg-bourbon text-porcelain py-2 rounded-md ring-1 ring-bourbon/30 shadow-md hover:bg-bourbon/90 transition
-dark:bg-leather dark:text-charcoal dark:ring-leather/30 dark:hover:bg-leather/90"
-                          >
-                            🎟️ Save My Spot
-                          </button>
-                        </form>
-                      )}
+  {formData[movie.id]?.seat !== null ? (
+    <button
+      type="submit"
+      className="w-full bg-bourbon text-porcelain py-2 rounded-md ring-1 ring-bourbon/30 shadow-md hover:bg-bourbon/90 transition dark:bg-leather dark:text-charcoal dark:ring-leather/30 dark:hover:bg-leather/90"
+    >
+      🎟️ Save My Spot
+    </button>
+  ) : (
+    <p className="text-sm text-center text-text-secondary-light">
+      ▶️ Choose a seat to continue
+    </p>
+  )}
+</form>
+                      
                     </>
                   )}
                 </section>
@@ -554,14 +565,14 @@ dark:bg-leather dark:text-charcoal dark:ring-leather/30 dark:hover:bg-leather/90
                 href={calendarLinks.google}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                className="bg-bourbon text-white px-4 py-2 rounded hover:bg-bourbon/90 transition"
               >
                 Google Calendar
               </a>
               <a
                 href={calendarLinks.ics}
                 download={`${calendarMovie.title}-Rodarte.ics`}
-                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+                className="bg-brass/40 text-charcoal px-4 py-2 rounded hover:bg-brass/50 transition dark:text-porcelain"
               >
                 iCalendar / Outlook
               </a>
