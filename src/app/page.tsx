@@ -226,14 +226,16 @@ END:VCALENDAR`
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-white dark:bg-gray-900 text-black dark:text-white space-y-12">
-     <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-white dark:bg-gradient-to-br dark:from-neutral-950 dark:to-neutral-900">
+      <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-white dark:bg-gradient-to-br dark:from-neutral-950 dark:to-neutral-900">
         <img
           src="/banner-overlay.png"
           alt=""
           className="absolute inset-0 w-full h-full object-cover opacity-50 pointer-events-none"
         />
+        {/* subtle sparkle / film‑grain overlay */}
+        <div className="absolute inset-0 bg-[url('/grain.png')] bg-cover opacity-10 pointer-events-none" />
         <div className="relative z-10 text-center text-white">
-          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight font-serif mb-4">Reels & Rye</h1>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight font-serif mb-3 bg-gradient-to-r from-amber-400 via-amber-600 to-rose-700 bg-clip-text text-transparent">Reels & Rye</h1>
           <p className="text-lg sm:text-xl text-neutral-300 max-w-md mx-auto">
             Movies. Bourbon. Brotherhood.
           </p>
