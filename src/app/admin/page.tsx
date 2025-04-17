@@ -65,6 +65,19 @@ export default function AdminPage() {
     }
   }
   
+  // Build Google Calendar & ICS links for a movie
+  const getCalendarLinks = (movie: Movie) => {
+    const start = getMovieDateTime(movie)
+    const end = new Date(start.getTime() + 3 * 60 * 60 * 1000) // 3‑hour duration
+    const fmt = (d: Date) => d.toISOString().replace(/[-:]|\.\d{3}/g, '')
+    const dates = `${fmt(start)}/${fmt(end)}`
+    const text = encodeURIComponent(movie.title)
+    const details = encodeURIComponent('Reels & Rye – Movie Night')
+    const location = encodeURIComponent('6760 Woodland Reserve Ct. Cincinnati, OH 45243')
+  
+    return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}&location=${location}`
+  }
+  
   const fetchAllMovies = async () => {
     try {
       const snapshot = await getDocs(collection(db, 'movies'))
@@ -391,6 +404,13 @@ export default function AdminPage() {
                 </button>
                 <button onClick={() => handleDelete(movie.id)} className="text-red-600 text-sm hover:underline">
                   Delete
+                </button>
+                <button
+                  onClick={() => window.open(getCalendarLinks(movie), '_blank', 'noopener,noreferrer')}
+                  className="text-sm bg-amber-700 text-white px-3 py-1 rounded hover:bg-amber-800 dark:bg-amber-500 dark:hover:bg-amber-600"
+                  title="Add to Google Calendar"
+                >
+                  Add&nbsp;to&nbsp;Calendar
                 </button>
                 <button
                   onClick={() => setEditingMovieId(movie.id)}
