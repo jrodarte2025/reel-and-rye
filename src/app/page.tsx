@@ -354,7 +354,7 @@ END:VCALENDAR`
                   />
                   <div className="space-y-3">
                     <details className="mb-2">
-                    <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow hover:bg-brass/30 dark:hover:bg-brass/40 transition">
+                    <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow-lg ring-1 ring-bourbon/20 dark:ring-leather/20 hover:bg-brass/30 dark:hover:bg-brass/40 transition">
                         About this Movie
                       </summary>
                       <div className="mt-2 space-y-3">
@@ -363,7 +363,7 @@ END:VCALENDAR`
                         <a
                           href={movie.imdb}
                           target="_blank"
-                          rel="noopener noreferrer"
+                          rel="noopener noreferrer" 
                         className="text-sm text-text-link-light hover:underline pl-1 dark:text-text-link-dark"
                         >
                           🎥 Watch the trailer
@@ -520,7 +520,8 @@ END:VCALENDAR`
                           />
                           <button
                             type="submit"
-                          className="w-full bg-bourbon text-white py-2 rounded-md hover:bg-bourbon/90 transition dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
+                          className="w-full bg-bourbon text-porcelain py-2 rounded-md ring-1 ring-bourbon/30 shadow-md hover:bg-bourbon/90 transition
+dark:bg-leather dark:text-charcoal dark:ring-leather/30 dark:hover:bg-leather/90"
                           >
                             🎟️ Save My Spot
                           </button>
