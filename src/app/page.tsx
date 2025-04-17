@@ -437,22 +437,24 @@ END:VCALENDAR`
                                     : 'bg-white hover:bg-amber-100 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-amber-900'
                                 }`}
                               >
-                              {isHostSeat ? (
-                                /* bourbon glass icon */
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-                                  <path d="M4 3h16v2H4z" />
-                                  <path d="M6 6h12l-1 10H7z" />
-                                  <path d="M7 18h10v2H7z" />
-                                </svg>
-                              ) : taken ? (
-                                /* filled seat icon */
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-                                  <path d="M5 3h14l-1 5v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8l-1-5z" />
-                                  <path d="M8 13h8v5H8z" />
+                              {taken ? (
+                                /* bourbon glass icon for all taken seats (host or reserved) */
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  className="w-6 h-6"
+                                >
+                                  <path d="M5 2h14a1 1 0 0 1 1 1v2a5 5 0 0 1-4 4.9V17a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3V9.9A5 5 0 0 1 4 5V3a1 1 0 0 1 1-1zm2 7v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9H7zm10-2.06A3 3 0 0 0 19 5V4H5v1a3 3 0 0 0 2 2.94V7h10v-.06z" />
                                 </svg>
                               ) : (
                                 /* empty seat outline */
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  className="w-6 h-6"
+                                >
                                   <path d="M4 10c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v3H4v-3z" />
                                   <path d="M2 16h20v2H2z" />
                                   <path d="M7 10V8h10v2H7z" />
