@@ -527,7 +527,13 @@ END:VCALENDAR`
   {formData[movie.id]?.seat !== null ? (
     <button
       type="submit"
-      className="w-full bg-bourbon text-porcelain py-2 rounded-md ring-1 ring-bourbon/30 shadow-md hover:bg-bourbon/90 transition dark:bg-leather dark:text-charcoal dark:ring-leather/30 dark:hover:bg-leather/90"
+      disabled={!formData[movie.id]?.name || !formData[movie.id]?.email}
+      className={`w-full py-2 rounded-md ring-1 ring-bourbon/30 shadow-md transition
+      ${
+        !formData[movie.id]?.name || !formData[movie.id]?.email
+          ? 'bg-bourbon/50 text-porcelain/70 cursor-not-allowed'
+          : 'bg-bourbon text-porcelain hover:bg-bourbon/90 active:scale-95 active:translate-y-[1px] dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90'
+      }`}
     >
       🎟️ Save My Spot
     </button>
@@ -565,14 +571,14 @@ END:VCALENDAR`
                 href={calendarLinks.google}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-bourbon text-white px-4 py-2 rounded hover:bg-bourbon/90 transition"
+              className="bg-bourbon text-porcelain px-4 py-2 rounded shadow hover:bg-bourbon/90 active:scale-95 active:translate-y-[1px] transition"
               >
                 Google Calendar
               </a>
               <a
                 href={calendarLinks.ics}
                 download={`${calendarMovie.title}-Rodarte.ics`}
-                className="bg-brass/40 text-charcoal px-4 py-2 rounded hover:bg-brass/50 transition dark:text-porcelain"
+              className="bg-brass/40 text-charcoal px-4 py-2 rounded shadow ring-1 ring-brass/60 hover:bg-brass/50 active:scale-95 active:translate-y-[1px] transition dark:text-porcelain"
               >
                 iCalendar / Outlook
               </a>
