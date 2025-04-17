@@ -225,8 +225,8 @@ END:VCALENDAR`
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-white dark:bg-gray-900 text-black dark:text-white space-y-12">
-      <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-white dark:bg-gradient-to-br dark:from-neutral-950 dark:to-neutral-900">
+  <main className="min-h-screen px-4 py-8 sm:px-6 md:px-10 bg-porcelain dark:bg-charcoal text-text-primary-light dark:text-text-primary-dark space-y-12">
+      <section className="relative w-full min-h-[60vh] px-6 py-20 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl bg-surface-light dark:bg-surface-dark">
         <img
           src="/banner-overlay.png"
           alt=""
@@ -235,7 +235,7 @@ END:VCALENDAR`
         {/* subtle sparkle / film‑grain overlay */}
         <div className="absolute inset-0 bg-[url('/grain.png')] bg-cover opacity-10 pointer-events-none" />
         <div className="relative z-10 text-center text-white">
-          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight font-serif mb-3 bg-gradient-to-r from-amber-400 via-amber-600 to-rose-700 bg-clip-text text-transparent">Reels & Rye</h1>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight font-serif mb-4">Reels & Rye</h1>
           <p className="text-lg sm:text-xl text-neutral-300 max-w-md mx-auto">
             Movies. Bourbon. Brotherhood.
           </p>
@@ -288,7 +288,7 @@ END:VCALENDAR`
         <div ref={confirmationRef}></div>
 
         {confirmation && (
-          <div className="fixed top-4 right-4 bg-amber-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 dark:bg-amber-500">
+          <div className="fixed top-4 right-4 bg-bourbon text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 dark:bg-leather dark:text-charcoal">
             {confirmation}
           </div>
         )}
@@ -310,7 +310,7 @@ END:VCALENDAR`
               >
                 <section className="p-6">
                 <h2 className="text-3xl font-serif font-bold mb-1 tracking-tight">{movie.title}</h2>
-                  <div className="inline-block bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 text-sm font-semibold px-3 py-1 rounded-full mb-3">
+                  <div className="inline-block bg-brass/20 dark:bg-brass/30 text-brass text-sm font-semibold px-3 py-1 rounded-full mb-3">
   🥃 Sip of the Night: {movie.pairing}
 </div>
                   {(() => {
@@ -354,7 +354,7 @@ END:VCALENDAR`
                   />
                   <div className="space-y-3">
                     <details className="mb-2">
-                      <summary className="cursor-pointer text-sm font-semibold text-amber-700 bg-amber-100 dark:bg-amber-900 px-4 py-2 rounded-md shadow hover:bg-amber-200 dark:hover:bg-amber-800 transition">
+                    <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow hover:bg-brass/30 dark:hover:bg-brass/40 transition">
                         About this Movie
                       </summary>
                       <div className="mt-2 space-y-3">
@@ -364,7 +364,7 @@ END:VCALENDAR`
                           href={movie.imdb}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:underline pl-1 dark:text-blue-400"
+                        className="text-sm text-text-link-light hover:underline pl-1 dark:text-text-link-dark"
                         >
                           🎥 Watch the trailer
                         </a>
@@ -520,7 +520,7 @@ END:VCALENDAR`
                           />
                           <button
                             type="submit"
-                            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-900 transition dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                          className="w-full bg-bourbon text-white py-2 rounded-md hover:bg-bourbon/90 transition dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
                           >
                             🎟️ Save My Spot
                           </button>
@@ -588,7 +588,7 @@ END:VCALENDAR`
         />
         <button
           onClick={handleSearch}
-          className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+          className="px-4 py-2 bg-bourbon text-white rounded-md hover:bg-bourbon/90 dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
         >
           Search
         </button>
