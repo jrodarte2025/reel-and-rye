@@ -438,14 +438,19 @@ END:VCALENDAR`
                                 }`}
                               >
                               {taken ? (
-                                <img
-                                  src="/bourbon-glass.svg"
-                                  alt="Taken seat"
-                                  width={24}
-                                  height={24}
-                                  className="object-contain"
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  className="w-6 h-6 text-amber-700 dark:text-amber-400"
                                   aria-hidden="true"
-                                />
+                                >
+                                  {/* rim */}
+                                  <rect x="4" y="3" width="16" height="2" rx="1" />
+                                  {/* body */}
+                                  <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
+                                  {/* base */}
+                                  <rect x="7" y="18" width="10" height="2" rx="1" />
+                                </svg>
                               ) : (
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
