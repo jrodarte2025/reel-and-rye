@@ -299,8 +299,9 @@ END:VCALENDAR`
           </p>
         ) : (
           movies.map((movie) => {
-            const reservedSeats = (rsvps[movie.id] || []).map((r) => r.seat)
-            const allSeatsTaken = [1, 2, 3, 4, 5].every(seat => reservedSeats.includes(seat))
+          const reservedSeats = (rsvps[movie.id] || []).map((r) => r.seat)
+          const takenSet = new Set([...reservedSeats, 1]) // seat 1 is always host‑occupied
+          const allSeatsTaken = [1, 2, 3, 4, 5].every(seat => takenSet.has(seat))
             const angerLevel = getAngerLevel(movie.runtime)
 
             return (
