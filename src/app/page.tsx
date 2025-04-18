@@ -433,13 +433,6 @@ END:VCALENDAR`
                           No more pours tonight. Catch the next reel soon.
                         </p>
 
-                        <button
-                          onClick={() => setShowWaitlistModal(true)}
-                          className="px-4 py-2 text-sm rounded border border-brass text-brass hover:bg-brass/10
-                                     dark:border-leather dark:text-leather dark:hover:bg-leather/10 transition"
-                        >
-                          Notify me for next screening
-                        </button>
                       </div>
                     </div>
                   ) : (
