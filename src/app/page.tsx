@@ -26,6 +26,7 @@ export default function Home() {
   const [showCalendarModal, setShowCalendarModal] = useState(false)
   const [calendarMovie, setCalendarMovie] = useState<any | null>(null)
   const [calendarLinks, setCalendarLinks] = useState<{ google: string; ics: string } | null>(null)
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [recommended, setRecommended] = useState<any[]>([])
@@ -405,26 +406,40 @@ END:VCALENDAR`
                           ))}
                         </div>
                       </div>
-                    
-                      {/* frosted overlay */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center bg-white/60 dark:bg-charcoal/60 backdrop-blur-lg rounded-lg ring-1 ring-bourbon/30 dark:ring-leather/30">
-                        {/* bourbon glass with splash */}
+                      {/* frosted sold‑out overlay */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center
+                                      bg-gradient-to-b from-brass/10 via-surface-dark/40 to-surface-dark/70
+                                      backdrop-blur-lg rounded-lg ring-2 ring-brass/40
+                                      animate-[pulseOnce_1.5s_ease-out_1]">
+                        {/* bourbon glass icon with pour animation */}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
-                          className="w-12 h-12 text-bourbon dark:text-leather mb-4 animate-bounce"
                           fill="currentColor"
+                          className="w-16 h-16 text-bourbon dark:text-leather mb-4"
                           aria-hidden="true"
                         >
                           <rect x="4" y="3" width="16" height="2" rx="1" />
                           <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
                           <rect x="7" y="18" width="10" height="2" rx="1" />
-                          <path className="fill-porcelain" d="M8 12h8v4H8z" /> {/* bourbon liquid */}
+                          {/* bourbon liquid */}
+                          <rect x="8" y="12" width="8" height="4" className="fill-porcelain animate-[pourOnce_0.7s_ease-out_forwards]" />
                         </svg>
-                        <h4 className="text-xl font-semibold mb-1 dark:text-[#DCC99A]">Screening Full</h4>
-                        <p className="text-text-secondary-light max-w-xs">
-                          This barrel's tapped &nbsp;— check next month!
+
+                        <h4 className="text-2xl font-semibold mb-1 dark:text-[#E8D8B9]">
+                          That’s a wrap — this screening’s full
+                        </h4>
+                        <p className="text-text-secondary-light max-w-xs mb-4">
+                          No more pours tonight. Catch the next reel soon.
                         </p>
+
+                        <button
+                          onClick={() => setShowWaitlistModal(true)}
+                          className="px-4 py-2 text-sm rounded border border-brass text-brass hover:bg-brass/10
+                                     dark:border-leather dark:text-leather dark:hover:bg-leather/10 transition"
+                        >
+                          Notify me for next screening
+                        </button>
                       </div>
                     </div>
                   ) : (
@@ -625,6 +640,31 @@ END:VCALENDAR`
           </div>
         </div>
       )}
+      
+      {showWaitlistModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowWaitlistModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm text-center space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-semibold">Join the Wait‑list</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Enter your email and we’ll notify you when the next screening opens!
+            </p>
+            {/* TODO: implement email capture */}
+            <button
+              onClick={() => setShowWaitlistModal(false)}
+              className="mt-4 px-4 py-2 bg-bourbon text-porcelain rounded hover:bg-bourbon/90 dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      
     <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
       <h3 className="text-lg font-semibold mb-2 text-center">
         🎬 Not seeing something you like? Recommend our next movie.

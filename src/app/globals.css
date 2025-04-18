@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* === Reels & Rye animations === */
+@keyframes pulseOnce {
+  0%   { box-shadow: 0 0 0 0 rgba(191,166,112,0.4); }
+  60%  { box-shadow: 0 0 0 8px rgba(191,166,112,0); }
+  100% { box-shadow: 0 0 0 0 rgba(191,166,112,0); }
+}
+
+@keyframes pourOnce {
+  0%   { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
