@@ -178,7 +178,7 @@ export default function Home() {
         const formattedStart = formatForCalendar(startDateTime)
         const formattedEnd = formatForCalendar(endDateTime)
 
-        const title = `${selectedMovie.title} - Rodarte Reels & Ryes`
+        const title = `${selectedMovie.title} - Rodarte Reels & Rye`
         const location = "6760 Woodland Reserve Ct. Cincinnati, OH 45243"
         const details = encodeURIComponent("Join us for movies, bourbon, and bonding.")
 
