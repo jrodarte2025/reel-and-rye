@@ -396,45 +396,26 @@ END:VCALENDAR`
                 <section className="p-6 md:border-l md:border-gray-200 dark:md:border-gray-700">
                 <h3 className="text-lg sm:text-xl font-semibold font-serif mb-4">Reserve Your Seat</h3>
                   {allSeatsTaken ? (
-                    <div className="relative">
-                      {/* blurred seat grid */}
-                      <div className="pointer-events-none opacity-40 blur-sm">
-                        {/* the existing seat‑grid JSX will be rendered here */}
-                        <div className="grid grid-cols-3 grid-rows-2 sm:grid-cols-5 gap-6 justify-center mb-6 max-w-md mx-auto">
-                          {[1, 2, 3, 4, 5].map((seat) => (
-                            <div key={seat} className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-300 dark:bg-gray-700 rounded-xl" />
-                          ))}
-                        </div>
-                      </div>
-                      {/* frosted sold‑out overlay */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center
-                                      bg-gradient-to-b from-brass/10 via-surface-dark/40 to-surface-dark/70
-                                      backdrop-blur-lg rounded-lg ring-2 ring-brass/40
-                                      animate-[pulseOnce_1.5s_ease-out_1]">
-                        {/* bourbon glass icon with pour animation */}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="w-16 h-16 text-bourbon dark:text-leather mb-4"
-                          aria-hidden="true"
-                        >
-                          <rect x="4" y="3" width="16" height="2" rx="1" />
-                          <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
-                          <rect x="7" y="18" width="10" height="2" rx="1" />
-                          {/* bourbon liquid */}
-                          <rect x="8" y="12" width="8" height="4" className="fill-porcelain animate-[pourOnce_0.7s_ease-out_forwards]" />
-                        </svg>
-
-                        <h4 className="text-2xl font-semibold mb-1 dark:text-[#E8D8B9]">
-                          That’s a wrap — this screening’s full
-                        </h4>
-                        <p className="text-text-secondary-light max-w-xs mb-4">
-                          No more pours tonight. Catch the next reel soon.
-                        </p>
-
-                      </div>
-                    </div>
+  <div className="flex flex-col items-center justify-center py-12">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="w-20 h-20 text-bourbon dark:text-leather mb-4"
+      aria-hidden="true"
+    >
+      <rect x="4" y="3" width="16" height="2" rx="1" />
+      <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
+      <rect x="7" y="18" width="10" height="2" rx="1" />
+      <rect x="8" y="12" width="8" height="4" className="fill-porcelain" />
+    </svg>
+    <h4 className="text-xl sm:text-2xl font-semibold dark:text-[#E8D8B9] text-center">
+      This screening is fully booked
+    </h4>
+    <p className="text-text-secondary-light text-center mt-1">
+      Check back soon for our next movie night.
+    </p>
+  </div>
                   ) : (
                     <>
                       <div className="grid grid-cols-3 grid-rows-2 sm:grid-cols-5 gap-6 justify-center mb-6 max-w-md mx-auto">
