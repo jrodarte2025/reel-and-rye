@@ -308,8 +308,9 @@ END:VCALENDAR`
               <div
                 key={movie.id}
                 className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start
-           bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm
-           rounded-2xl shadow-xl ring-1 ring-black/5 hover:scale-[1.01] hover:shadow-2xl transition"
+           bg-surface-light/80 dark:bg-surface-dark/60 backdrop-blur-sm
+           rounded-2xl shadow-xl ring-1 ring-black/5 dark:ring-white/10
+           hover:scale-[1.01] hover:shadow-2xl transition"
               >
                 <section className="p-6">
                 <h2 className="text-3xl font-serif font-bold mb-1 tracking-tight">{movie.title}</h2>
@@ -411,7 +412,7 @@ END:VCALENDAR`
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
-                          className="w-12 h-12 text-bourbon mb-4 animate-bounce"
+                          className="w-12 h-12 text-bourbon dark:text-leather mb-4 animate-bounce"
                           fill="currentColor"
                           aria-hidden="true"
                         >
@@ -420,9 +421,9 @@ END:VCALENDAR`
                           <rect x="7" y="18" width="10" height="2" rx="1" />
                           <path className="fill-porcelain" d="M8 12h8v4H8z" /> {/* bourbon liquid */}
                         </svg>
-                        <h4 className="text-xl font-semibold mb-1">All seats saved</h4>
+                        <h4 className="text-xl font-semibold mb-1 dark:text-[#DCC99A]">Screening Full</h4>
                         <p className="text-text-secondary-light max-w-xs">
-                          No more pours tonight&nbsp;— all spots claimed!
+                          This barrel's tapped &nbsp;— check next month!
                         </p>
                       </div>
                     </div>
