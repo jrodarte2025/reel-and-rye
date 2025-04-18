@@ -307,7 +307,9 @@ END:VCALENDAR`
             return (
               <div
                 key={movie.id}
-                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start rounded-lg shadow-lg transform transition hover:scale-[1.01] hover:shadow-xl"
+                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start
+           bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm
+           rounded-2xl shadow-xl ring-1 ring-black/5 hover:scale-[1.01] hover:shadow-2xl transition"
               >
                 <section className="p-6">
                 <h2 className="text-3xl font-serif font-bold mb-1 tracking-tight">{movie.title}</h2>
@@ -389,7 +391,7 @@ END:VCALENDAR`
                   </div>
                 </section>
 
-                <section className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                <section className="p-6 md:border-l md:border-gray-200 dark:md:border-gray-700">
                 <h3 className="text-lg sm:text-xl font-semibold font-serif mb-4">Reserve Your Seat</h3>
                   {allSeatsTaken ? (
                     <div className="relative">
