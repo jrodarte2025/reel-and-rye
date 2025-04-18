@@ -419,7 +419,7 @@ END:VCALENDAR`
                         </svg>
                         <h4 className="text-xl font-semibold mb-1">All seats saved</h4>
                         <p className="text-text-secondary-light max-w-xs">
-                          No more pours tonight&nbsp;— all spots claimed.
+                          No more pours tonight&nbsp;— all spots claimed!
                         </p>
                       </div>
                     </div>
