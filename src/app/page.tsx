@@ -314,7 +314,7 @@ END:VCALENDAR`
            hover:scale-[1.01] hover:shadow-2xl transition"
               >
                 <section className="p-6">
-                <h2 className="text-3xl font-serif font-bold mb-1 tracking-tight">{movie.title}</h2>
+                <h2 className="text-3xl sm:text-4xl font-serif font-semibold mb-2 tracking-tight">{movie.title}</h2>
                   <div className="inline-block bg-brass/20 dark:bg-brass/30 text-brass text-sm font-semibold px-3 py-1 rounded-full mb-3">
   🥃 Sip of the Night: {movie.pairing}
 </div>
@@ -394,7 +394,7 @@ END:VCALENDAR`
                 </section>
 
                 <section className="p-6 md:border-l md:border-gray-200 dark:md:border-gray-700">
-                <h3 className="text-lg sm:text-xl font-semibold font-serif mb-4">Reserve Your Seat</h3>
+                <h3 className="text-xl sm:text-2xl font-serif font-semibold mb-4 tracking-tight">Reserve Your Seat</h3>
                   {allSeatsTaken ? (
   <div className="flex flex-col items-center justify-center py-12">
     <svg
@@ -640,7 +640,7 @@ END:VCALENDAR`
       )}
       
     <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
-      <h3 className="text-lg font-semibold mb-2 text-center">
+      <h3 className="text-xl font-serif font-semibold mb-4 text-center tracking-tight">
         🎬 Not seeing something you like? Recommend our next movie.
       </h3>
       <div className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4">
@@ -689,7 +689,7 @@ END:VCALENDAR`
 
     {recommended.length > 0 && (
         <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm mt-12">
-        <h3 className="text-lg font-semibold mb-4 text-center">
+        <h3 className="text-xl font-serif font-semibold mb-4 text-center tracking-tight">
           📢 Top Recommended Movies
         </h3>
         <ul className="space-y-2 text-left">
