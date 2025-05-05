@@ -308,14 +308,11 @@ END:VCALENDAR`
             return (
               <div
                 key={movie.id}
-                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-12 items-start bg-surface-light/80 dark:bg-surface-dark/60 backdrop-blur-sm rounded-2xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 hover:scale-[1.01] hover:shadow-2xl transition"
+                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-x-12 gap-y-10 items-start bg-surface-light/80 dark:bg-surface-dark/60 backdrop-blur-sm rounded-2xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 hover:scale-[1.01] hover:shadow-2xl transition"
               >
                 <section className="p-6">
                   <div className="space-y-6">
-                    <h2 className="text-4xl font-serif font-semibold tracking-tight mb-3">{movie.title}</h2>
-                    <div className="inline-block bg-brass/20 dark:bg-brass/30 text-brass text-sm font-semibold px-3 py-1 rounded-full mb-4">
-                      🥃 Sip of the Night: {movie.pairing}
-                    </div>
+                    <h2 className="text-4xl font-serif font-semibold tracking-tight mb-2">{movie.title}</h2>
                     {(() => {
                       try {
                         const [timePart, modifier] = movie.time.split(' ')
@@ -338,25 +335,28 @@ END:VCALENDAR`
                           ? 'rd' : 'th'
 
                         return (
-                          <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark mb-4">
+                          <p className="text-lg font-medium tracking-tight text-bourbon-dark dark:text-bourbon-light">
                             🗓️ {weekday}, {month} {day}{suffix} at {movie.time}
                           </p>
                         )
                       } catch {
                         return (
-                          <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark mb-4">
+                          <p className="text-lg font-medium tracking-tight text-bourbon-dark dark:text-bourbon-light">
                             🗓️ {movie.date} at {movie.time}
                           </p>
                         )
                       }
                     })()}
+                    <div className="inline-block mt-2 bg-bourbon-accent/20 dark:bg-bourbon-accent/30 text-bourbon-dark text-sm font-medium px-3 py-1 rounded-full">
+                      🥃 Sip of the Night: {movie.pairing}
+                    </div>
                     <img
                       src={movie.poster}
                       alt={movie.title}
                       className="mb-6 w-full max-w-[240px] mx-auto rounded shadow"
                     />
-                    <div className="space-y-4">
-                      <details className="mb-2">
+                    <div className="space-y-6">
+                      <details className="mt-4 mb-4">
                         <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow-lg ring-1 ring-bourbon/20 dark:ring-leather/20 hover:bg-brass/30 dark:hover:bg-brass/40 transition">
                           About this Movie
                         </summary>
@@ -373,12 +373,14 @@ END:VCALENDAR`
                           </a>
                         </div>
                       </details>
-                      <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">
-                        🎭 {movie.genre}
-                      </p>
-                      <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">
-                        Runtime: {movie.runtime} min
-                      </p>
+                      <div className="flex flex-wrap gap-4 items-center">
+                        <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">
+                          🎭 {movie.genre}
+                        </p>
+                        <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">
+                          Runtime: {movie.runtime} min
+                        </p>
+                      </div>
                     </div>
                     <div className="flex items-center mt-2 mb-4">
                       <span className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark mr-2">Angry Wife Meter:</span>
@@ -396,7 +398,7 @@ END:VCALENDAR`
                   </div>
                 </section>
 
-                <section className="p-6 md:border-l md:border-bourbon-dividerLight dark:md:border-bourbon-dividerDark bg-bourbon-surfaceLight dark:bg-bourbon-surfaceDark rounded-lg space-y-6">
+                <section className="p-6 bg-bourbon-surfaceLight dark:bg-bourbon-surfaceDark space-y-6">
                 <h3 className="text-xl sm:text-2xl font-serif font-semibold mb-4 tracking-tight">Reserve Your Seat</h3>
                   {allSeatsTaken ? (
   <div className="flex flex-col items-center justify-center py-12">
