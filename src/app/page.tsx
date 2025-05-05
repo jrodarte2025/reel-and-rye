@@ -308,98 +308,93 @@ END:VCALENDAR`
             return (
               <div
                 key={movie.id}
-                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-x-12 gap-y-10 items-start bg-surface-light/80 dark:bg-surface-dark/60 backdrop-blur-sm rounded-2xl shadow-xl ring-1 ring-black/5 dark:ring-white/10 hover:scale-[1.01] hover:shadow-2xl transition"
+                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start
+           bg-surface-light/80 dark:bg-surface-dark/60 backdrop-blur-sm
+           rounded-2xl shadow-xl ring-1 ring-black/5 dark:ring-white/10
+           hover:scale-[1.01] hover:shadow-2xl transition"
               >
                 <section className="p-6">
-                  <div className="space-y-6">
-                    <h2 className="text-4xl font-serif font-semibold tracking-tight mb-2">{movie.title}</h2>
-                    {(() => {
-                      try {
-                        const [timePart, modifier] = movie.time.split(' ')
-                        const hour = parseInt(timePart, 10)
-                        if (isNaN(hour) || !movie.date || !modifier) throw new Error("Invalid time format")
-
-                        const adjustedHour = (modifier === 'PM' && hour !== 12)
-                          ? hour + 12
-                          : (modifier === 'AM' && hour === 12 ? 0 : hour)
-
-                        const formattedHour = adjustedHour.toString().padStart(2, '0')
-                        const fullDate = new Date(`${movie.date}T${formattedHour}:00:00`)
-
-                        const weekday = fullDate.toLocaleDateString('en-US', { weekday: 'long' })
-                        const month = fullDate.toLocaleDateString('en-US', { month: 'long' })
-                        const day = fullDate.getDate()
-                        const suffix = (day === 1 || day === 21 || day === 31)
-                          ? 'st' : (day === 2 || day === 22)
-                          ? 'nd' : (day === 3 || day === 23)
-                          ? 'rd' : 'th'
-
-                        return (
-                          <p className="text-lg font-medium tracking-tight text-bourbon-dark dark:text-bourbon-light">
-                            🗓️ {weekday}, {month} {day}{suffix} at {movie.time}
-                          </p>
-                        )
-                      } catch {
-                        return (
-                          <p className="text-lg font-medium tracking-tight text-bourbon-dark dark:text-bourbon-light">
-                            🗓️ {movie.date} at {movie.time}
-                          </p>
-                        )
-                      }
-                    })()}
-                    <div className="inline-block mt-2 bg-bourbon-accent/20 dark:bg-bourbon-accent/30 text-bourbon-dark text-sm font-medium px-3 py-1 rounded-full">
-                      🥃 Sip of the Night: {movie.pairing}
-                    </div>
-                    <img
-                      src={movie.poster}
-                      alt={movie.title}
-                      className="mb-6 w-full max-w-[240px] mx-auto rounded shadow"
-                    />
-                    <div className="space-y-6">
-                      <details className="mt-4 mb-4">
-                        <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow-lg ring-1 ring-bourbon/20 dark:ring-leather/20 hover:bg-brass/30 dark:hover:bg-brass/40 transition">
-                          About this Movie
-                        </summary>
-                        <div className="mt-2 space-y-3">
-                          <p className="leading-relaxed text-gray-700 dark:text-gray-300 text-balance">{movie.synopsis}</p>
-                          <hr className="border-gray-300 dark:border-gray-600" />
-                          <a
-                            href={movie.imdb}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-text-link-light hover:underline pl-1 dark:text-text-link-dark"
-                          >
-                            🎥 Watch the trailer
-                          </a>
-                        </div>
-                      </details>
-                      <div className="flex flex-wrap gap-4 items-center">
-                        <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">
-                          🎭 {movie.genre}
+                <h2 className="text-3xl font-serif font-bold mb-1 tracking-tight">{movie.title}</h2>
+                  <div className="inline-block bg-brass/20 dark:bg-brass/30 text-brass text-sm font-semibold px-3 py-1 rounded-full mb-3">
+  🥃 Sip of the Night: {movie.pairing}
+</div>
+                  {(() => {
+                    try {
+                      const [timePart, modifier] = movie.time.split(' ')
+                      const hour = parseInt(timePart, 10)
+                      if (isNaN(hour) || !movie.date || !modifier) throw new Error("Invalid time format")
+ 
+                      const adjustedHour = (modifier === 'PM' && hour !== 12)
+                        ? hour + 12
+                        : (modifier === 'AM' && hour === 12 ? 0 : hour)
+ 
+                      const formattedHour = adjustedHour.toString().padStart(2, '0')
+                      const fullDate = new Date(`${movie.date}T${formattedHour}:00:00`)
+ 
+                      const weekday = fullDate.toLocaleDateString('en-US', { weekday: 'long' })
+                      const month = fullDate.toLocaleDateString('en-US', { month: 'long' })
+                      const day = fullDate.getDate()
+                      const suffix = (day === 1 || day === 21 || day === 31)
+                        ? 'st' : (day === 2 || day === 22)
+                        ? 'nd' : (day === 3 || day === 23)
+                        ? 'rd' : 'th'
+ 
+                      return (
+                        <p className="text-gray-500 dark:text-gray-400 mb-2">
+                          🗓️ {weekday}, {month} {day}{suffix} at {movie.time}
                         </p>
-                        <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">
-                          Runtime: {movie.runtime} min
+                      )
+                    } catch {
+                      return (
+                        <p className="text-gray-500 dark:text-gray-400 mb-2">
+                          🗓️ {movie.date} at {movie.time}
                         </p>
+                      )
+                    }
+                  })()}
+                  <img
+                    src={movie.poster}
+                    alt={movie.title}
+                    className="w-full max-w-[240px] mx-auto rounded shadow mb-4"
+                  />
+                  <div className="space-y-3">
+                    <details className="mb-2">
+                    <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow-lg ring-1 ring-bourbon/20 dark:ring-leather/20 hover:bg-brass/30 dark:hover:bg-brass/40 transition">
+                        About this Movie
+                      </summary>
+                      <div className="mt-2 space-y-3">
+                      <p className="leading-relaxed text-gray-700 dark:text-gray-300 text-balance">{movie.synopsis}</p>
+                        <hr className="border-gray-300 dark:border-gray-600" />
+                        <a
+                          href={movie.imdb}
+                          target="_blank"
+                          rel="noopener noreferrer" 
+                        className="text-sm text-text-link-light hover:underline pl-1 dark:text-text-link-dark"
+                        >
+                          🎥 Watch the trailer
+                        </a>
                       </div>
+                    </details>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
+                    <p className="text-gray-500 dark:text-gray-400">Runtime: {movie.runtime} min</p>
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <span className="mr-2 text-sm">Angry Wife Meter:</span>
+                    <div className="relative w-48 h-2 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden" title="Estimated household tension">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${angerLevel}%`,
+                          background: `linear-gradient(to right, #fecaca, #f87171, #b91c1c)`
+                        }}
+                      ></div>
                     </div>
-                    <div className="flex items-center mt-2 mb-4">
-                      <span className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark mr-2">Angry Wife Meter:</span>
-                      <div className="relative w-48 h-2 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden" title="Estimated household tension">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${angerLevel}%`,
-                            background: `linear-gradient(to right, #fecaca, #f87171, #b91c1c)`
-                          }}
-                        ></div>
-                      </div>
-                      <span className={`ml-2 text-xl ${angerLevel === 100 ? 'animate-pulse' : ''}`}>{getWifeMood(movie.runtime)}</span>
-                    </div>
+                    <span className={`ml-2 text-xl ${angerLevel === 100 ? 'animate-pulse' : ''}`}>{getWifeMood(movie.runtime)}</span>
                   </div>
                 </section>
 
-                <section className="p-6 bg-bourbon-surfaceLight dark:bg-bourbon-surfaceDark space-y-6">
-                <h3 className="text-xl sm:text-2xl font-serif font-semibold mb-4 tracking-tight">Reserve Your Seat</h3>
+                <section className="p-6 md:border-l md:border-gray-200 dark:md:border-gray-700">
+                <h3 className="text-lg sm:text-xl font-semibold font-serif mb-4">Reserve Your Seat</h3>
                   {allSeatsTaken ? (
   <div className="flex flex-col items-center justify-center py-12">
     <svg
@@ -645,7 +640,7 @@ END:VCALENDAR`
       )}
       
     <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
-      <h3 className="text-xl font-serif font-semibold mb-4 text-center tracking-tight">
+      <h3 className="text-lg font-semibold mb-2 text-center">
         🎬 Not seeing something you like? Recommend our next movie.
       </h3>
       <div className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4">
@@ -694,7 +689,7 @@ END:VCALENDAR`
 
     {recommended.length > 0 && (
         <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm mt-12">
-        <h3 className="text-xl font-serif font-semibold mb-4 text-center tracking-tight">
+        <h3 className="text-lg font-semibold mb-4 text-center">
           📢 Top Recommended Movies
         </h3>
         <ul className="space-y-2 text-left">
