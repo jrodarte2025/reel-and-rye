@@ -315,7 +315,7 @@ END:VCALENDAR`
               >
                 <section className="p-6">
                 <h2 className="text-3xl sm:text-4xl font-serif font-semibold mb-2 tracking-tight">{movie.title}</h2>
-                  <div className="inline-block bg-brass/20 dark:bg-brass/30 text-brass text-sm font-semibold px-3 py-1 rounded-full mb-3">
+                  <div className="inline-block bg-brass/20 dark:bg-brass/30 text-brass text-sm font-semibold px-3 py-1 rounded-full mb-4">
   🥃 Sip of the Night: {movie.pairing}
 </div>
                   {(() => {
@@ -355,9 +355,9 @@ END:VCALENDAR`
                   <img
                     src={movie.poster}
                     alt={movie.title}
-                    className="w-full max-w-[240px] mx-auto rounded shadow mb-4"
+                    className="w-full max-w-[240px] mx-auto rounded shadow mb-6"
                   />
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <details className="mb-2">
                     <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow-lg ring-1 ring-bourbon/20 dark:ring-leather/20 hover:bg-brass/30 dark:hover:bg-brass/40 transition">
                         About this Movie
@@ -378,7 +378,7 @@ END:VCALENDAR`
                     <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
                     <p className="text-gray-500 dark:text-gray-400">Runtime: {movie.runtime} min</p>
                   </div>
-                  <div className="flex items-center mt-2">
+                  <div className="flex items-center mt-2 mb-4">
                     <span className="mr-2 text-sm">Angry Wife Meter:</span>
                     <div className="relative w-48 h-2 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden" title="Estimated household tension">
                       <div
