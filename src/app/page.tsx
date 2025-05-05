@@ -308,16 +308,16 @@ END:VCALENDAR`
             return (
               <div
                 key={movie.id}
-                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start
+                className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start
            bg-surface-light/80 dark:bg-surface-dark/60 backdrop-blur-sm
            rounded-2xl shadow-xl ring-1 ring-black/5 dark:ring-white/10
            hover:scale-[1.01] hover:shadow-2xl transition"
               >
                 <section className="p-6">
-                <h2 className="text-3xl font-serif font-bold mb-1 tracking-tight">{movie.title}</h2>
-                  <div className="inline-block bg-brass/20 dark:bg-brass/30 text-brass text-sm font-semibold px-3 py-1 rounded-full mb-3">
-  🥃 Sip of the Night: {movie.pairing}
-</div>
+                  <h2 className="text-4xl font-serif font-semibold mb-2 tracking-tight">{movie.title}</h2>
+                  <div className="inline-block bg-bourbon-accent/20 dark:bg-bourbon-accent/30 text-bourbon-dark text-base font-medium px-3 py-1 rounded-full mb-2">
+                    🥃 Sip of the Night: {movie.pairing}
+                  </div>
                   {(() => {
                     try {
                       const [timePart, modifier] = movie.time.split(' ')
@@ -340,13 +340,13 @@ END:VCALENDAR`
                         ? 'rd' : 'th'
  
                       return (
-                        <p className="text-gray-500 dark:text-gray-400 mb-2">
+                        <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark mb-4">
                           🗓️ {weekday}, {month} {day}{suffix} at {movie.time}
                         </p>
                       )
                     } catch {
                       return (
-                        <p className="text-gray-500 dark:text-gray-400 mb-2">
+                        <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark mb-4">
                           🗓️ {movie.date} at {movie.time}
                         </p>
                       )
@@ -359,27 +359,27 @@ END:VCALENDAR`
                   />
                   <div className="space-y-3">
                     <details className="mb-2">
-                    <summary className="cursor-pointer text-sm font-semibold text-brass bg-brass/20 dark:bg-brass/30 px-4 py-2 rounded-md shadow-lg ring-1 ring-bourbon/20 dark:ring-leather/20 hover:bg-brass/30 dark:hover:bg-brass/40 transition">
+                      <summary className="cursor-pointer text-base font-medium text-bourbon-dark bg-bourbon-accent/20 dark:bg-bourbon-accent/30 px-4 py-2 rounded-md shadow-sm ring-1 ring-bourbon-accent/20 hover:bg-bourbon-accent/30 dark:hover:bg-bourbon-accent/40 transition">
                         About this Movie
                       </summary>
                       <div className="mt-2 space-y-3">
-                      <p className="leading-relaxed text-gray-700 dark:text-gray-300 text-balance">{movie.synopsis}</p>
+                        <p className="leading-relaxed text-gray-700 dark:text-gray-300 text-balance">{movie.synopsis}</p>
                         <hr className="border-gray-300 dark:border-gray-600" />
                         <a
                           href={movie.imdb}
                           target="_blank"
-                          rel="noopener noreferrer" 
-                        className="text-sm text-text-link-light hover:underline pl-1 dark:text-text-link-dark"
+                          rel="noopener noreferrer"
+                          className="text-sm text-bourbon-linkLight hover:underline pl-1 dark:text-bourbon-linkDark"
                         >
                           🎥 Watch the trailer
                         </a>
                       </div>
                     </details>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
-                    <p className="text-gray-500 dark:text-gray-400">Runtime: {movie.runtime} min</p>
+                    <p className="text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">🎭 {movie.genre}</p>
+                    <p className="text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">Runtime: {movie.runtime} min</p>
                   </div>
                   <div className="flex items-center mt-2">
-                    <span className="mr-2 text-sm">Angry Wife Meter:</span>
+                    <span className="mr-2 text-sm text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark">Angry Wife Meter:</span>
                     <div className="relative w-48 h-2 bg-gray-200 dark:bg-gray-600 rounded-xl overflow-hidden" title="Estimated household tension">
                       <div
                         className="h-full rounded-full transition-all duration-500"
@@ -393,8 +393,8 @@ END:VCALENDAR`
                   </div>
                 </section>
 
-                <section className="p-6 md:border-l md:border-gray-200 dark:md:border-gray-700">
-                <h3 className="text-lg sm:text-xl font-semibold font-serif mb-4">Reserve Your Seat</h3>
+                <section className="p-6 md:border-l md:border-bourbon-dividerLight dark:md:border-bourbon-dividerDark">
+                  <h3 className="text-xl font-serif font-semibold mb-4">Reserve Your Seat</h3>
                   {allSeatsTaken ? (
   <div className="flex flex-col items-center justify-center py-12">
     <svg
@@ -413,7 +413,7 @@ END:VCALENDAR`
       This screening is fully booked
     </h4>
     <p className="text-text-secondary-light text-center mt-1">
-      Check back soon for our next movie night.
+      Scroll down for more options.
     </p>
   </div>
                   ) : (
@@ -427,14 +427,14 @@ END:VCALENDAR`
                           return (
                             <div key={seat} className="text-center group relative">
                               <button
-  disabled={taken}
-  title={
-    isHostSeat
-      ? 'Host seat'
-      : taken
-      ? `Reserved by ${guest || 'guest'}`
-      : `Seat ${seat}`
-  }
+                                disabled={taken}
+                                title={
+                                  isHostSeat
+                                    ? 'Host seat'
+                                    : taken
+                                    ? `Reserved by ${guest || 'guest'}`
+                                    : `Seat ${seat}`
+                                }
                                 onClick={() => {
                                   setFormData({
                                     [movie.id]: {
@@ -443,56 +443,56 @@ END:VCALENDAR`
                                     },
                                   })
                                   setConfirmation(`Seat ${seat} selected!`)
-                              setTimeout(() => setConfirmation(''), 2000)
-  
-                              setTimeout(() => {
-                                const input = document.querySelector(`#name-${movie.id}`) as HTMLInputElement | null
-                                if (input) {
-                                  input.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                                  input.focus()
-                                }
-                              }, 250)
-                            }}
-                              className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md hover:scale-105 transform transition duration-200 ease-in-out ${
+                                  setTimeout(() => setConfirmation(''), 2000)
+
+                                  setTimeout(() => {
+                                    const input = document.querySelector(`#name-${movie.id}`) as HTMLInputElement | null
+                                    if (input) {
+                                      input.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                      input.focus()
+                                    }
+                                  }, 250)
+                                }}
+                                className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center font-bold text-lg rounded-xl shadow-md hover:scale-105 transform transition duration-200 ease-in-out ${
                                   taken
                                     ? 'bg-gray-300 text-white cursor-not-allowed dark:bg-gray-700'
-                              : selected
-                                  ? 'bg-bourbon text-porcelain ring-2 ring-offset-2 ring-bourbon/30 animate-pulse'
+                                    : selected
+                                    ? 'bg-bourbon text-porcelain ring-2 ring-offset-2 ring-bourbon/30 animate-pulse'
                                     : 'bg-white hover:bg-amber-100 border border-gray-300 text-black dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-amber-900'
                                 }`}
                               >
-                              {taken ? (
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  className="w-6 h-6 text-amber-700 dark:text-amber-400"
-                                  aria-hidden="true"
-                                >
-                                  {/* rim */}
-                                  <rect x="4" y="3" width="16" height="2" rx="1" />
-                                  {/* body */}
-                                  <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
-                                  {/* base */}
-                                  <rect x="7" y="18" width="10" height="2" rx="1" />
-                                </svg>
-                              ) : (
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  className="w-6 h-6"
-                                >
-                                  <path d="M4 10c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v3H4v-3z" />
-                                  <path d="M2 16h20v2H2z" />
-                                  <path d="M7 10V8h10v2H7z" />
-                                </svg>
-                              )}
+                                {taken ? (
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    className="w-6 h-6 text-amber-700 dark:text-amber-400"
+                                    aria-hidden="true"
+                                  >
+                                    {/* rim */}
+                                    <rect x="4" y="3" width="16" height="2" rx="1" />
+                                    {/* body */}
+                                    <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
+                                    {/* base */}
+                                    <rect x="7" y="18" width="10" height="2" rx="1" />
+                                  </svg>
+                                ) : (
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    className="w-6 h-6"
+                                  >
+                                    <path d="M4 10c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v3H4v-3z" />
+                                    <path d="M2 16h20v2H2z" />
+                                    <path d="M7 10V8h10v2H7z" />
+                                  </svg>
+                                )}
                               </button>
                               {!taken && (
                                 <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">{seat}</p>
                               )}
                               {taken && guest && (
-                                <p className="text-xs text-text-secondary-light text-center mt-1">{guest.split(' ')[0]}</p>
+                                <p className="text-xs text-bourbon-secondaryTextLight dark:text-bourbon-secondaryTextDark text-center mt-1">{guest.split(' ')[0]}</p>
                               )}
                             </div>
                           )
@@ -640,7 +640,7 @@ END:VCALENDAR`
       )}
       
     <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
-      <h3 className="text-lg font-semibold mb-2 text-center">
+      <h3 className="text-xl font-serif font-semibold mb-4 text-center">
         🎬 Not seeing something you like? Recommend our next movie.
       </h3>
       <div className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4">
@@ -689,7 +689,7 @@ END:VCALENDAR`
 
     {recommended.length > 0 && (
         <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm mt-12">
-        <h3 className="text-lg font-semibold mb-4 text-center">
+        <h3 className="text-xl font-serif font-semibold mb-4 text-center">
           📢 Top Recommended Movies
         </h3>
         <ul className="space-y-2 text-left">
