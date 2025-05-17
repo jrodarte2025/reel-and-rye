@@ -223,13 +223,22 @@ export default function AdminPage() {
 
   const handleRemoveRsvp = async (movieId: string, seat: number) => {
     const match = rsvps[movieId]?.find(r => r.seat === seat)
-    if (match) {
-      await deleteDoc(doc(db, 'rsvps', match.id))
-      setRsvps(prev => ({
-        ...prev,
-        [movieId]: prev[movieId].filter(r => r.id !== match.id),
-      }))
-      setConfirmRemove(null)
+    console.log('🔍 RSVP removal triggered:', { movieId, seat, match })
+
+    if (match && match.id) {
+      try {
+        console.log('🗑️ Deleting RSVP with ID:', match.id)
+        await deleteDoc(doc(db, 'rsvps', match.id))
+        setRsvps(prev => ({
+          ...prev,
+          [movieId]: prev[movieId].filter(r => r.id !== match.id),
+        }))
+        setConfirmRemove(null)
+      } catch (err) {
+        console.error('❌ Error deleting RSVP:', err)
+      }
+    } else {
+      console.warn('⚠️ No valid RSVP match found for removal', { movieId, seat })
     }
   }
 
