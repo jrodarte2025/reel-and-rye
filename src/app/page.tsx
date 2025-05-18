@@ -30,6 +30,7 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [recommended, setRecommended] = useState<any[]>([])
   const [voted, setVoted] = useState<string[]>([])
+  const [waitlistEmails, setWaitlistEmails] = useState<Record<string, string>>({})
   const scheduledTitles = useMemo(() => new Set(movies.map((m) => m.title)), [movies])
 
   const handleSearch = async () => {
@@ -58,6 +59,26 @@ export default function Home() {
     setSearchResults([])
     setConfirmation(`${movie.title} was recommended! ✅`)
     setTimeout(() => setConfirmation(''), 3000)
+  }
+
+  const handleWaitlist = async (movieId: string, e: React.FormEvent) => {
+    e.preventDefault()
+    const email = waitlistEmails[movieId]
+    if (!email) return
+    try {
+      await addDoc(collection(db, 'waitlist'), {
+        movieId,
+        email,
+        timestamp: new Date(),
+      })
+      setWaitlistEmails((prev) => ({ ...prev, [movieId]: '' }))
+      setConfirmation('Added to wait list! ✅')
+      setTimeout(() => setConfirmation(''), 4000)
+    } catch (err: any) {
+      console.error('Waitlist error:', err?.message || err)
+      setConfirmation(`Something went wrong: ${err?.message || 'unknown error'}`)
+      setTimeout(() => setConfirmation(''), 4000)
+    }
   }
 
   useEffect(() => {
@@ -425,6 +446,34 @@ END:VCALENDAR`
                         <p className="text-text-secondary-light max-w-xs">
                           This barrel's tapped &nbsp;— check next month!
                         </p>
+                        <form
+                          onSubmit={(e) => handleWaitlist(movie.id, e)}
+                          className="mt-4 flex flex-col sm:flex-row gap-2 justify-center"
+                        >
+                          <label htmlFor={`wait-${movie.id}`} className="sr-only">
+                            Email
+                          </label>
+                          <input
+                            id={`wait-${movie.id}`}
+                            type="email"
+                            placeholder="Join wait list"
+                            value={waitlistEmails[movie.id] || ''}
+                            onChange={(e) =>
+                              setWaitlistEmails((prev) => ({
+                                ...prev,
+                                [movie.id]: e.target.value,
+                              }))
+                            }
+                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                            required
+                          />
+                          <button
+                            type="submit"
+                            className="bg-bourbon text-porcelain px-4 py-2 rounded-md shadow hover:bg-bourbon/90 active:scale-95 active:translate-y-[1px] dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
+                          >
+                            Notify Me
+                          </button>
+                        </form>
                       </div>
                     </div>
                   ) : (
@@ -513,49 +562,59 @@ END:VCALENDAR`
   onSubmit={(e) => handleRSVP(movie.id, e)}
   className="space-y-4 mt-4"
 >
-  <input
-    id={`name-${movie.id}`}
-    type="text"
-    placeholder="Name (select a seat first)"
-    value={formData[movie.id]?.name || ''}
-    disabled={formData[movie.id]?.seat === null}
-    onChange={(e) =>
-      setFormData((prev) => ({
-        ...prev,
-        [movie.id]: {
-          ...(prev[movie.id] || { seat: null, email: '' }),
-          name: e.target.value,
-        },
-      }))
-    }
-    className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md ${
-      formData[movie.id]?.seat === null
-        ? 'opacity-40 cursor-not-allowed dark:bg-gray-800'
-        : 'dark:bg-gray-700'
-    }`}
-    required
-  />
-  <input
-    type="email"
-    placeholder="Email (select a seat first)"
-    value={formData[movie.id]?.email || ''}
-    disabled={formData[movie.id]?.seat === null}
-    onChange={(e) =>
-      setFormData((prev) => ({
-        ...prev,
-        [movie.id]: {
-          ...(prev[movie.id] || { seat: null, name: '' }),
-          email: e.target.value,
-        },
-      }))
-    }
-    className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md ${
-      formData[movie.id]?.seat === null
-        ? 'opacity-40 cursor-not-allowed dark:bg-gray-800'
-        : 'dark:bg-gray-700'
-    }`}
-    required
-  />
+  <fieldset className="space-y-4">
+    <legend className="sr-only">RSVP</legend>
+    <label htmlFor={`name-${movie.id}`} className="sr-only">
+      Name
+    </label>
+    <input
+      id={`name-${movie.id}`}
+      type="text"
+      placeholder="Name (select a seat first)"
+      value={formData[movie.id]?.name || ''}
+      disabled={formData[movie.id]?.seat === null}
+      onChange={(e) =>
+        setFormData((prev) => ({
+          ...prev,
+          [movie.id]: {
+            ...(prev[movie.id] || { seat: null, email: '' }),
+            name: e.target.value,
+          },
+        }))
+      }
+      className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md ${
+        formData[movie.id]?.seat === null
+          ? 'opacity-40 cursor-not-allowed dark:bg-gray-800'
+          : 'dark:bg-gray-700'
+      }`}
+      required
+    />
+    <label htmlFor={`email-${movie.id}`} className="sr-only">
+      Email
+    </label>
+    <input
+      id={`email-${movie.id}`}
+      type="email"
+      placeholder="Email (select a seat first)"
+      value={formData[movie.id]?.email || ''}
+      disabled={formData[movie.id]?.seat === null}
+      onChange={(e) =>
+        setFormData((prev) => ({
+          ...prev,
+          [movie.id]: {
+            ...(prev[movie.id] || { seat: null, name: '' }),
+            email: e.target.value,
+          },
+        }))
+      }
+      className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md ${
+        formData[movie.id]?.seat === null
+          ? 'opacity-40 cursor-not-allowed dark:bg-gray-800'
+          : 'dark:bg-gray-700'
+      }`}
+      required
+    />
+  </fieldset>
 
   {formData[movie.id]?.seat !== null ? (
     <button
