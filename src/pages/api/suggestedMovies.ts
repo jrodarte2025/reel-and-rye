@@ -1,5 +1,4 @@
 // src/pages/api/suggestedMovies.ts
-// Last updated: <today's date> for clean redeploy
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
