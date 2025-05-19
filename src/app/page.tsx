@@ -17,6 +17,33 @@ function getWifeMood(runtime: number): string {
   return '😠'
 }
 
+function parseMovieDateTime(movie: { date: string; time: string }): Date {
+  try {
+    const [timePart, modifier] = movie.time.split(' ')
+    const [rawHour] = timePart.split(':')
+    let hour = parseInt(rawHour)
+    if (modifier === 'PM' && hour !== 12) hour += 12
+    if (modifier === 'AM' && hour === 12) hour = 0
+    const formattedHour = hour.toString().padStart(2, '0')
+    return new Date(`${movie.date}T${formattedHour}:00:00`)
+  } catch {
+    return new Date(0)
+  }
+}
+
+function BourbonRating({ rating }: { rating: number }) {
+  const value = Math.round(rating)
+  return (
+    <div className="flex">
+      {[...Array(5)].map((_, i) => (
+        <span key={i} className={i < value ? 'text-bourbon' : 'text-gray-300'}>
+          🥃
+        </span>
+      ))}
+    </div>
+  )
+}
+
 export default function Home() {
   const [movies, setMovies] = useState<any[]>([])
   const [rsvps, setRsvps] = useState<Record<string, any[]>>({})
@@ -31,6 +58,12 @@ export default function Home() {
   const [recommended, setRecommended] = useState<any[]>([])
   const [voted, setVoted] = useState<string[]>([])
   const scheduledTitles = useMemo(() => new Set(movies.map((m) => m.title)), [movies])
+  const watchedMovies = useMemo(() => {
+    const now = new Date()
+    return movies
+      .filter(m => parseMovieDateTime(m) <= now)
+      .sort((a, b) => parseMovieDateTime(b).getTime() - parseMovieDateTime(a).getTime())
+  }, [movies])
 
   const handleSearch = async () => {
     if (searchQuery.length < 2) return
@@ -63,27 +96,14 @@ export default function Home() {
   useEffect(() => {
     const fetchMovies = async () => {
       setMovies([])
-    const snapshot = await getDocs(collection(db, 'movies'))
-    const data = snapshot.docs.map((doc) => {
-      const movie = doc.data() as { date: string; time: string; [key: string]: any }
-      return { id: doc.id, ...movie }
-    })
-      const parseMovieDateTime = (movie: { date: string; time: string }) => {
-        try {
-          const [timePart, modifier] = movie.time.split(' ')
-          const [rawHour] = timePart.split(':')
-          let hour = parseInt(rawHour)
-          if (modifier === 'PM' && hour !== 12) hour += 12
-          if (modifier === 'AM' && hour === 12) hour = 0
-          const formattedHour = hour.toString().padStart(2, '0')
-          return new Date(`${movie.date}T${formattedHour}:00:00`)
-        } catch {
-          return new Date(0) // fallback if time is invalid
-        }
-      }
+      const snapshot = await getDocs(collection(db, 'movies'))
+      const data = snapshot.docs.map((doc) => {
+        const movie = doc.data() as { date: string; time: string; [key: string]: any }
+        return { id: doc.id, ...movie }
+      })
 
-      const sorted = data.sort((a, b) =>
-        parseMovieDateTime(a).getTime() - parseMovieDateTime(b).getTime()
+      const sorted = data.sort(
+        (a, b) => parseMovieDateTime(a).getTime() - parseMovieDateTime(b).getTime()
       )
       setMovies(sorted)
     }
@@ -738,6 +758,30 @@ END:VCALENDAR`
                     </div>
                   </>
                 )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {watchedMovies.length > 0 && (
+      <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm mt-12">
+        <h3 className="text-lg font-semibold mb-4 text-center">
+          🍿 Watched Movies
+        </h3>
+        <ul className="space-y-2 text-left">
+          {watchedMovies.map((movie: any) => (
+            <li
+              key={movie.id}
+              className="flex justify-between items-center bg-white dark:bg-gray-800 px-4 py-2 rounded shadow"
+            >
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{movie.title}</span>
+              <div className="flex items-center gap-2">
+                <BourbonRating rating={movie.rating || 0} />
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {movie.date}
+                </span>
+              </div>
             </li>
           ))}
         </ul>
