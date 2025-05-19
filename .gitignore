@@ -50,3 +50,16 @@ scripts/*.json
 .env
 *.tar.gz
 *.zip
+
+# editor and shell configuration
+.vscode/
+.idea/
+.bashrc
+.zshrc
+.profile
+.bash_profile
+.zprofile
+.bash_history
+.zsh_history
+*.swp
+*~
