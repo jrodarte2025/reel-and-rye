@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { db } from '../../lib/firebase'
+import BourbonRating from '../../components/BourbonRating'
 import {
   collection,
   addDoc,
@@ -19,6 +20,7 @@ type Movie = {
   date: string
   time: string
   pairing?: string
+  rating?: number
   [key: string]: any
 }
 
@@ -42,6 +44,8 @@ export default function AdminPage() {
   const [editingMovieId, setEditingMovieId] = useState<string | null>(null)
   const [editSearchResults, setEditSearchResults] = useState<any[]>([])
   const [justUpdatedId, setJustUpdatedId] = useState<string | null>(null)
+  const [ratingEdits, setRatingEdits] = useState<Record<string, number>>({})
+  const [ratingUpdateStatus, setRatingUpdateStatus] = useState<Record<string, 'idle' | 'saving' | 'saved'>>({})
   
   const fetchRecommendedMovies = async () => {
     const snapshot = await getDocs(collection(db, 'recommendedMovies'))
@@ -519,6 +523,56 @@ export default function AdminPage() {
           </div>
         ))}
       </div>
+
+      {/* Watched Movies & Ratings */}
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold">🍿 Watched Movies</h2>
+        {watchedMovies.length === 0 ? (
+          <p className="text-gray-400">No watched movies.</p>
+        ) : (
+          watchedMovies
+            .sort((a, b) => getMovieDateTime(b).getTime() - getMovieDateTime(a).getTime())
+            .map((movie) => {
+              const currentRating = ratingEdits[movie.id] ?? movie.rating ?? 0
+              return (
+                <div key={movie.id} className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl p-4 shadow">
+                  <div>
+                    <h3 className="font-semibold">{movie.title}</h3>
+                    <p className="text-sm text-gray-500">{new Date().toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <BourbonRating
+                      value={currentRating}
+                      onChange={(val) => setRatingEdits(prev => ({ ...prev, [movie.id]: val }))}
+                    />
+                    <button
+                      onClick={async () => {
+                        setRatingUpdateStatus(prev => ({ ...prev, [movie.id]: 'saving' }))
+                        const ref = doc(db, 'movies', movie.id)
+                        await updateDoc(ref, { rating: currentRating })
+                        setWatchedMovies(prev => prev.map(m => m.id === movie.id ? { ...m, rating: currentRating } : m))
+                        setRatingUpdateStatus(prev => ({ ...prev, [movie.id]: 'saved' }))
+                        setTimeout(() => {
+                          setRatingUpdateStatus(prev => ({ ...prev, [movie.id]: 'idle' }))
+                        }, 3000)
+                      }}
+                      className="text-sm bg-black text-white px-3 py-1 rounded hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                    >
+                      Save Rating
+                    </button>
+                    {ratingUpdateStatus[movie.id] === 'saving' && (
+                      <span className="text-sm text-gray-500">Saving...</span>
+                    )}
+                    {ratingUpdateStatus[movie.id] === 'saved' && (
+                      <span className="text-sm text-green-600">Saved!</span>
+                    )}
+                  </div>
+                </div>
+              )
+            })
+        )}
+      </div>
+
       <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow space-y-4">
         <h2 className="text-xl font-semibold">🎯 User Recommended Movies</h2>
         {recommendedMovies.length === 0 ? (
