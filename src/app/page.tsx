@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { db } from '../lib/firebase'
 import { collection, getDocs, addDoc, query, where, updateDoc, doc } from 'firebase/firestore'
+import BourbonRating from './BourbonRating'
 
 function getAngerLevel(runtime: number): number {
   const min = 60
@@ -17,8 +18,28 @@ function getWifeMood(runtime: number): string {
   return '😠'
 }
 
+function formatMovieDate(movie: { date: string; time: string }): string {
+  try {
+    const [timePart, modifier] = movie.time.split(' ')
+    const [rawHour] = timePart.split(':')
+    let hour = parseInt(rawHour)
+    if (modifier === 'PM' && hour !== 12) hour += 12
+    if (modifier === 'AM' && hour === 12) hour = 0
+    const formattedHour = hour.toString().padStart(2, '0')
+    const dateObj = new Date(`${movie.date}T${formattedHour}:00:00`)
+    return dateObj.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  } catch {
+    return movie.date
+  }
+}
+
 export default function Home() {
   const [movies, setMovies] = useState<any[]>([])
+  const [watchedMovies, setWatchedMovies] = useState<any[]>([])
   const [rsvps, setRsvps] = useState<Record<string, any[]>>({})
   const [formData, setFormData] = useState<Record<string, { name: string; email: string; seat: number | null }>>({})
   const [confirmation, setConfirmation] = useState<string>('')
@@ -63,11 +84,12 @@ export default function Home() {
   useEffect(() => {
     const fetchMovies = async () => {
       setMovies([])
-    const snapshot = await getDocs(collection(db, 'movies'))
-    const data = snapshot.docs.map((doc) => {
-      const movie = doc.data() as { date: string; time: string; [key: string]: any }
-      return { id: doc.id, ...movie }
-    })
+      setWatchedMovies([])
+      const snapshot = await getDocs(collection(db, 'movies'))
+      const data = snapshot.docs.map((doc) => {
+        const movie = doc.data() as { date: string; time: string; [key: string]: any }
+        return { id: doc.id, ...movie }
+      })
       const parseMovieDateTime = (movie: { date: string; time: string }) => {
         try {
           const [timePart, modifier] = movie.time.split(' ')
@@ -85,7 +107,11 @@ export default function Home() {
       const sorted = data.sort((a, b) =>
         parseMovieDateTime(a).getTime() - parseMovieDateTime(b).getTime()
       )
-      setMovies(sorted)
+      const now = new Date()
+      const upcoming = sorted.filter(m => parseMovieDateTime(m) >= now)
+      const watched = sorted.filter(m => parseMovieDateTime(m) < now)
+      setMovies(upcoming)
+      setWatchedMovies(watched.sort((a, b) => parseMovieDateTime(b).getTime() - parseMovieDateTime(a).getTime()))
     }
     fetchMovies()
   }, [])
@@ -625,6 +651,22 @@ END:VCALENDAR`
           </div>
         </div>
       )}
+    {watchedMovies.length > 0 && (
+      <section className="max-w-3xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
+        <h3 className="text-lg font-semibold mb-4 text-center">🍿 Watched Movies</h3>
+        <ul className="space-y-4">
+          {watchedMovies.map(movie => (
+            <li key={movie.id} className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{movie.title}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{formatMovieDate(movie)}</p>
+              </div>
+              <BourbonRating movieId={movie.id} rating={movie.rating || 0} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
     <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
       <h3 className="text-lg font-semibold mb-2 text-center">
         🎬 Not seeing something you like? Recommend our next movie.
