@@ -17,8 +17,24 @@ function getWifeMood(runtime: number): string {
   return '😠'
 }
 
+function getMovieDateTime(movie: { date: string; time: string }) {
+  try {
+    const [timePart, modifier] = movie.time.split(' ')
+    const [rawHour] = timePart.split(':')
+    let hour = parseInt(rawHour)
+    if (modifier === 'PM' && hour !== 12) hour += 12
+    if (modifier === 'AM' && hour === 12) hour = 0
+    const formattedHour = hour.toString().padStart(2, '0')
+    return new Date(`${movie.date}T${formattedHour}:00:00`)
+  } catch {
+    return new Date(`${movie.date}T12:00:00`)
+  }
+}
+
 export default function Home() {
   const [movies, setMovies] = useState<any[]>([])
+  const [upcomingMovies, setUpcomingMovies] = useState<any[]>([])
+  const [pastMovies, setPastMovies] = useState<any[]>([])
   const [rsvps, setRsvps] = useState<Record<string, any[]>>({})
   const [formData, setFormData] = useState<Record<string, { name: string; email: string; seat: number | null }>>({})
   const [confirmation, setConfirmation] = useState<string>('')
@@ -63,39 +79,34 @@ export default function Home() {
   useEffect(() => {
     const fetchMovies = async () => {
       setMovies([])
-    const snapshot = await getDocs(collection(db, 'movies'))
-    const data = snapshot.docs.map((doc) => {
-      const movie = doc.data() as { date: string; time: string; [key: string]: any }
-      return { id: doc.id, ...movie }
-    })
-      const parseMovieDateTime = (movie: { date: string; time: string }) => {
-        try {
-          const [timePart, modifier] = movie.time.split(' ')
-          const [rawHour] = timePart.split(':')
-          let hour = parseInt(rawHour)
-          if (modifier === 'PM' && hour !== 12) hour += 12
-          if (modifier === 'AM' && hour === 12) hour = 0
-          const formattedHour = hour.toString().padStart(2, '0')
-          return new Date(`${movie.date}T${formattedHour}:00:00`)
-        } catch {
-          return new Date(0) // fallback if time is invalid
-        }
-      }
+      const snapshot = await getDocs(collection(db, 'movies'))
+      const data = snapshot.docs.map((doc) => {
+        const movie = doc.data() as { date: string; time: string; [key: string]: any }
+        return { id: doc.id, ...movie }
+      })
 
-      const sorted = data.sort((a, b) =>
-        parseMovieDateTime(a).getTime() - parseMovieDateTime(b).getTime()
+      const sorted = data.sort(
+        (a, b) => getMovieDateTime(a).getTime() - getMovieDateTime(b).getTime()
       )
       setMovies(sorted)
+
+      const now = new Date()
+      setUpcomingMovies(sorted.filter((m) => getMovieDateTime(m) > now))
+      setPastMovies(
+        sorted
+          .filter((m) => getMovieDateTime(m) <= now)
+          .sort((a, b) => getMovieDateTime(b).getTime() - getMovieDateTime(a).getTime())
+      )
     }
     fetchMovies()
   }, [])
 
   useEffect(() => {
-    if (movies.length === 0) return
+    if (upcomingMovies.length === 0) return
     const fetchAllRsvps = async () => {
       const result: Record<string, any[]> = {}
       await Promise.all(
-        movies.map(async (movie) => {
+        upcomingMovies.map(async (movie) => {
           const q = query(collection(db, 'rsvps'), where('movieId', '==', movie.id))
           const snapshot = await getDocs(q)
           result[movie.id] = snapshot.docs.map((doc) => doc.data())
@@ -104,7 +115,7 @@ export default function Home() {
       setRsvps(result)
     }
     fetchAllRsvps()
-  }, [movies])
+  }, [upcomingMovies])
 
   useEffect(() => {
     if (confirmation.includes("You're in") && confirmationRef.current) {
@@ -156,7 +167,7 @@ export default function Home() {
         timestamp: new Date(),
       })
 
-      const selectedMovie = movies.find((m) => m.id === movieId)
+      const selectedMovie = upcomingMovies.find((m) => m.id === movieId)
       if (selectedMovie) {
         console.log('Selected movie for calendar:', selectedMovie)
         if (!selectedMovie.date || !selectedMovie.time) {
@@ -240,8 +251,8 @@ END:VCALENDAR`
             Movies. Bourbon. Brotherhood.
           </p>
 
-          {movies.length > 0 && (() => {
-            const firstMovie = movies[0];
+          {upcomingMovies.length > 0 ? (() => {
+            const firstMovie = upcomingMovies[0];
             try {
               const [timePart, modifier] = firstMovie.time.split(' ');
               const hour = parseInt(timePart, 10);
@@ -277,7 +288,11 @@ END:VCALENDAR`
                 </div>
               );
             }
-          })()}
+          })() : (
+            <div className="mt-6 bg-white/10 border border-white/10 backdrop-blur-md px-6 py-4 rounded-xl shadow-md inline-block">
+              <p className="text-sm uppercase text-neutral-300 tracking-wide mb-1">No upcoming screenings</p>
+            </div>
+          )}
         </div>
         <div className="absolute bottom-4 text-xs text-neutral-400 text-center w-full">
           ⬇️ Scroll down to RSVP or recommend a movie
@@ -297,8 +312,12 @@ END:VCALENDAR`
           <p className="text-center text-gray-400 italic animate-pulse dark:text-gray-500">
             Loading movie magic…
           </p>
+        ) : upcomingMovies.length === 0 ? (
+          <p className="text-center text-gray-400 italic dark:text-gray-500">
+            No upcoming screenings.
+          </p>
         ) : (
-          movies.map((movie) => {
+          upcomingMovies.map((movie) => {
           const reservedSeats = (rsvps[movie.id] || []).map((r) => r.seat)
           const takenSet = new Set([...reservedSeats, 1]) // seat 1 is always host‑occupied
           const allSeatsTaken = [1, 2, 3, 4, 5].every(seat => takenSet.has(seat))
@@ -740,6 +759,32 @@ END:VCALENDAR`
                 )}
             </li>
           ))}
+        </ul>
+      </section>
+    )}
+    {pastMovies.length > 0 && (
+      <section className="max-w-2xl mx-auto py-10 px-6 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm mt-12">
+        <h3 className="text-lg font-semibold mb-4 text-center">📽️ Past Screenings</h3>
+        <ul className="space-y-2 text-left">
+          {pastMovies.map((movie) => {
+            const dateStr = getMovieDateTime(movie).toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })
+            return (
+              <li
+                key={movie.id}
+                className="flex justify-between items-center bg-white dark:bg-gray-800 px-4 py-2 rounded shadow"
+              >
+                <span className="font-medium">{movie.title}</span>
+                <div className="flex gap-4 items-center">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">{dateStr}</span>
+                  {movie.rating && <span className="text-sm">⭐ {movie.rating}</span>}
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </section>
     )}
