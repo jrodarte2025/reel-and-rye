@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { db } from '../lib/firebase'
 import { collection, getDocs, addDoc, query, where, updateDoc, doc } from 'firebase/firestore'
+import BourbonRating from '../components/BourbonRating'
 
 function getAngerLevel(runtime: number): number {
   const min = 60
@@ -376,6 +377,7 @@ END:VCALENDAR`
                     </details>
                     <p className="text-sm text-gray-500 dark:text-gray-400">🎭 {movie.genre}</p>
                     <p className="text-gray-500 dark:text-gray-400">Runtime: {movie.runtime} min</p>
+                    <BourbonRating rating={movie.rating ?? 0} label="Bourbon Rating" />
                   </div>
                   <div className="flex items-center mt-2">
                     <span className="mr-2 text-sm">Angry Wife Meter:</span>
