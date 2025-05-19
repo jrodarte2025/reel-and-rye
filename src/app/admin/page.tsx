@@ -242,6 +242,18 @@ export default function AdminPage() {
     }
   }
 
+  const handleRatingChange = async (movieId: string, rating: number) => {
+    setWatchedMovies(prev =>
+      prev.map(m => (m.id === movieId ? { ...m, rating } : m))
+    )
+    try {
+      await updateDoc(doc(db, 'movies', movieId), { rating })
+      await fetchAllMovies()
+    } catch (err) {
+      console.error('Failed to update rating:', err)
+    }
+  }
+
   if (!passwordEntered) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-900 px-4">
@@ -350,8 +362,8 @@ export default function AdminPage() {
       {/* Upcoming Movies + Seat Management */}
       <div className="space-y-10">
       {[...upcomingMovies]
-  .sort((a, b) => getMovieDateTime(a).getTime() - getMovieDateTime(b).getTime())
-  .map((movie) => (
+        .sort((a, b) => getMovieDateTime(a).getTime() - getMovieDateTime(b).getTime())
+        .map((movie) => (
           <div
             key={movie.id}
             className={`rounded-2xl p-6 shadow-md space-y-4 transition duration-500 ${
@@ -519,6 +531,48 @@ export default function AdminPage() {
           </div>
         ))}
       </div>
+
+      {/* Watched Movies */}
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold">🍿 Watched Movies</h2>
+        {watchedMovies.length === 0 ? (
+          <p className="text-gray-400">No watched movies yet.</p>
+        ) : (
+          <ul className="space-y-4">
+            {[...watchedMovies]
+              .sort((a, b) => getMovieDateTime(b).getTime() - getMovieDateTime(a).getTime())
+              .map((movie) => (
+                <li key={movie.id} className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{movie.title}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">🥃 {movie.pairing || 'No pairing listed'}</p>
+                  </div>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => handleRatingChange(movie.id, n)}
+                        className="focus:outline-none"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          className={`w-6 h-6 ${movie.rating >= n ? 'text-bourbon dark:text-leather' : 'text-gray-300 dark:text-gray-600'}`}
+                          fill="currentColor"
+                        >
+                          <rect x="4" y="3" width="16" height="2" rx="1" />
+                          <path d="M6 6h12l-1 10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3L6 6Z" />
+                          <rect x="7" y="18" width="10" height="2" rx="1" />
+                        </svg>
+                      </button>
+                    ))}
+                  </div>
+                </li>
+              ))}
+          </ul>
+        )}
+      </div>
+
       <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow space-y-4">
         <h2 className="text-xl font-semibold">🎯 User Recommended Movies</h2>
         {recommendedMovies.length === 0 ? (
