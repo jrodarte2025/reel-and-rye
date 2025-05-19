@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { db } from '../lib/firebase'
 import { collection, getDocs, addDoc, query, where, updateDoc, doc } from 'firebase/firestore'
 
-function getAngerLevel(runtime: number): number {
+export function getAngerLevel(runtime: number): number {
   const min = 60
   const max = 160
   const clamped = Math.min(Math.max(runtime, min), max)
@@ -178,7 +178,7 @@ export default function Home() {
         const formattedStart = formatForCalendar(startDateTime)
         const formattedEnd = formatForCalendar(endDateTime)
 
-        const title = `${selectedMovie.title} - Rodarte Reels & Rye`
+        const title = `${selectedMovie.title} - Rodarte's Reel & Rye`
         const location = "6760 Woodland Reserve Ct. Cincinnati, OH 45243"
         const details = encodeURIComponent("Join us for movies, bourbon, and bonding.")
 
