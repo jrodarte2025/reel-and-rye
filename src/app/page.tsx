@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, FormEvent } from 'react'
 import { db } from '../lib/firebase'
 import { collection, getDocs, addDoc, query, where, updateDoc, doc } from 'firebase/firestore'
 
@@ -648,7 +648,16 @@ END:VCALENDAR`
       <h3 className="text-lg font-semibold mb-2 text-center">
         🎬 Not seeing something you like? Recommend our next movie.
       </h3>
-      <div className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4">
+      <form
+        onSubmit={(e: FormEvent) => {
+          e.preventDefault();
+          if (searchTimeout.current) clearTimeout(searchTimeout.current);
+          searchTimeout.current = setTimeout(() => {
+            handleSearch();
+          }, 300);
+        }}
+        className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4"
+      >
         <input
           type="text"
           placeholder="Search for a movie"
@@ -657,18 +666,13 @@ END:VCALENDAR`
           className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800"
         />
         <button
-          onClick={() => {
-            if (searchTimeout.current) clearTimeout(searchTimeout.current)
-            searchTimeout.current = setTimeout(() => {
-              handleSearch()
-            }, 300)
-          }}
+          type="submit"
           disabled={searchQuery.length < 2 || searchLoading}
           className="px-4 py-2 bg-bourbon text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-bourbon/90 dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
         >
           {searchLoading ? 'Searching…' : 'Search'}
         </button>
-      </div>
+      </form>
       {searchResults.length > 0 && (
         <ul className="space-y-2 max-w-md mx-auto">
           {searchResults.map((movie: any) => (
