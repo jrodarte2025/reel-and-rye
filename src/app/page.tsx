@@ -28,15 +28,34 @@ export default function Home() {
   const [calendarLinks, setCalendarLinks] = useState<{ google: string; ics: string } | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null)
   const [recommended, setRecommended] = useState<any[]>([])
   const [voted, setVoted] = useState<string[]>([])
   const scheduledTitles = useMemo(() => new Set(movies.map((m) => m.title)), [movies])
 
   const handleSearch = async () => {
-    if (searchQuery.length < 2) return
-    const res = await fetch(`/api/searchMovie?query=${encodeURIComponent(searchQuery)}`)
-    const data = await res.json()
-    setSearchResults(data)
+    console.log('handleSearch called with query:', searchQuery)
+    if (searchQuery.length < 2) {
+      console.log('Query too short, skipping search')
+      return
+    }
+    setSearchLoading(true)
+    try {
+      const res = await fetch(`/api/searchMovie?query=${encodeURIComponent(searchQuery)}`)
+      if (!res.ok) {
+        console.error('Search API returned error:', res.status, res.statusText)
+        return
+      }
+      const data = await res.json()
+      console.log('Search results:', data)
+      setSearchResults(data)
+    } catch (err) {
+      console.error('Error fetching search results:', err)
+    }
+    finally {
+      setSearchLoading(false)
+    }
   }
 
   const handleRecommend = async (movie: any) => {
@@ -638,10 +657,16 @@ END:VCALENDAR`
           className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800"
         />
         <button
-          onClick={handleSearch}
-          className="px-4 py-2 bg-bourbon text-white rounded-md hover:bg-bourbon/90 dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
+          onClick={() => {
+            if (searchTimeout.current) clearTimeout(searchTimeout.current)
+            searchTimeout.current = setTimeout(() => {
+              handleSearch()
+            }, 300)
+          }}
+          disabled={searchQuery.length < 2 || searchLoading}
+          className="px-4 py-2 bg-bourbon text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-bourbon/90 dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
         >
-          Search
+          {searchLoading ? 'Searching…' : 'Search'}
         </button>
       </div>
       {searchResults.length > 0 && (
