@@ -50,3 +50,4 @@ scripts/*.json
 .env
 *.tar.gz
 *.zip
+.env*.local

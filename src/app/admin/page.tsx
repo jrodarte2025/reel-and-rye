@@ -369,12 +369,22 @@ export default function AdminPage() {
                 <input
                   type="date"
                   value={movie.date}
-                  onChange={(e) => handleEdit(movie.id, e.target.value, movie.time)}
+                  onChange={(e) => {
+                    const newDate = e.target.value;
+                    setUpcomingMovies(prev =>
+                      prev.map(m => m.id === movie.id ? { ...m, date: newDate } : m)
+                    );
+                  }}
                   className="border px-2 py-1 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 />
                 <select
                   value={movie.time}
-                  onChange={(e) => handleEdit(movie.id, movie.date, e.target.value)}
+                  onChange={(e) => {
+                    const newTime = e.target.value;
+                    setUpcomingMovies(prev =>
+                      prev.map(m => m.id === movie.id ? { ...m, time: newTime } : m)
+                    );
+                  }}
                   className="border px-2 py-1 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 >
                   {[...Array(10)].map((_, i) => {
@@ -383,6 +393,14 @@ export default function AdminPage() {
                     return <option key={hour} value={label}>{label}</option>
                   })}
                 </select>
+                <button
+                  onClick={async () => {
+                    await handleEdit(movie.id, movie.date, movie.time);
+                  }}
+                  className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                >
+                  Save Date/Time
+                </button>
                 <input
                   type="text"
                   placeholder="Edit pairing"
