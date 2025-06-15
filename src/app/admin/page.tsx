@@ -23,6 +23,7 @@ type Movie = {
 }
 
 export default function AdminPage() {
+  console.log('🔧 AdminPage loaded');
   const [passwordEntered, setPasswordEntered] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [title, setTitle] = useState('')
@@ -210,9 +211,11 @@ export default function AdminPage() {
   const handleEdit = async (id: string, newDate: string, newTime: string) => {
     const ref = doc(db, 'movies', id)
     await updateDoc(ref, { date: newDate, time: newTime })
-    setUpcomingMovies(prev =>
-      prev.map(m => m.id === id ? { ...m, date: newDate, time: newTime } : m)
-    )
+    // Refresh the list from Firestore
+    await fetchAllMovies()
+    // Optionally highlight the updated item
+    setJustUpdatedId(id)
+    setTimeout(() => setJustUpdatedId(null), 3000)
   }
 
   const handleEditSearch = async (query: string) => {
