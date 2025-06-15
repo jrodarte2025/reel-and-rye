@@ -538,7 +538,7 @@ export default function AdminPage() {
         ))}
       </div>
       <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow space-y-4">
-        <h2 className="text-xl font-semibold">🎯 User Recommended Movies</h2>
+        <h2 className="text-xl font-semibold">User Recommended Movies</h2>
         {recommendedMovies.length === 0 ? (
           <p className="text-gray-400">No recommended movies yet.</p>
         ) : (
