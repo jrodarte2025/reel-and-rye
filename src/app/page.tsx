@@ -68,6 +68,12 @@ export default function Home() {
         votes: 1,
         timestamp: new Date(),
       })
+      // Refresh recommended list immediately
+      const recSnapshot = await getDocs(collection(db, 'recommendedMovies'));
+      const updated = recSnapshot.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0));
+      setRecommended(updated);
     } else {
       setConfirmation(`${movie.title} has already been recommended!`)
       setTimeout(() => setConfirmation(''), 3000)
@@ -648,31 +654,33 @@ END:VCALENDAR`
       <h3 className="text-lg font-semibold mb-2 text-center">
         🎬 Not seeing something you like? Recommend our next movie.
       </h3>
-      <form
-        onSubmit={(e: FormEvent) => {
-          e.preventDefault();
-          if (searchTimeout.current) clearTimeout(searchTimeout.current);
-          searchTimeout.current = setTimeout(() => {
-            handleSearch();
-          }, 300);
-        }}
-        className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4"
-      >
+      <div className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-4">
         <input
           type="text"
           placeholder="Search for a movie"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSearchQuery(val);
+            if (searchTimeout.current) clearTimeout(searchTimeout.current);
+            if (val.length >= 2) {
+              searchTimeout.current = setTimeout(() => {
+                handleSearch();
+              }, 300);
+            } else {
+              setSearchResults([]);
+            }
+          }}
           className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800"
         />
         <button
-          type="submit"
+          onClick={handleSearch}
           disabled={searchQuery.length < 2 || searchLoading}
           className="px-4 py-2 bg-bourbon text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-bourbon/90 dark:bg-leather dark:text-charcoal dark:hover:bg-leather/90"
         >
           {searchLoading ? 'Searching…' : 'Search'}
         </button>
-      </form>
+      </div>
       {searchResults.length > 0 && (
         <ul className="space-y-2 max-w-md mx-auto">
           {searchResults.map((movie: any) => (
@@ -690,10 +698,17 @@ END:VCALENDAR`
               <div className="flex-1 text-sm text-gray-800 dark:text-white">
                 <p className="font-medium">{movie.title}</p>
                 <button
-                  className="mt-1 text-xs bg-emerald-600 text-white px-2 py-1 rounded hover:bg-emerald-700"
+                  className="mt-1 text-xs px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => handleRecommend(movie)}
+                  disabled={recommended.some((r) => r.tmdbId === movie.id)}
+                  style={{
+                    backgroundColor: recommended.some((r) => r.tmdbId === movie.id)
+                      ? 'gray'
+                      : '#059669',
+                    color: 'white'
+                  }}
                 >
-                  Recommend
+                  {recommended.some((r) => r.tmdbId === movie.id) ? 'Already submitted' : 'Recommend'}
                 </button>
               </div>
             </li>
