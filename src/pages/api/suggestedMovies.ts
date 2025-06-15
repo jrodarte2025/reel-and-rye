@@ -2,7 +2,19 @@
 // Last updated: <today's date> for clean redeploy
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+interface MovieSuggestion {
+  title: string;
+}
+interface Suggestions {
+  TopPicks: MovieSuggestion[];
+  CriticFavorites: MovieSuggestion[];
+  lastUpdated: string;
+}
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Suggestions>
+) {
   const suggestions = {
     TopPicks: [
       { title: 'Inception' },
@@ -15,5 +27,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     ]
   }
 
-  res.status(200).json(suggestions)
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=86400, stale-while-revalidate=86400'
+  );
+
+  res.status(200).json({
+    ...suggestions,
+    lastUpdated: new Date().toISOString(),
+  });
 }
