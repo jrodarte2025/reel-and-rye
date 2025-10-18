@@ -43,6 +43,8 @@ export default function AdminPage() {
   const [editingMovieId, setEditingMovieId] = useState<string | null>(null)
   const [editSearchResults, setEditSearchResults] = useState<any[]>([])
   const [justUpdatedId, setJustUpdatedId] = useState<string | null>(null)
+  const [addGuestForms, setAddGuestForms] = useState<Record<string, { name: string; email: string; seat: number | null }>>({})
+  const [addGuestStatus, setAddGuestStatus] = useState<Record<string, 'idle' | 'adding' | 'success' | 'error'>>({})
   
   const fetchRecommendedMovies = async () => {
     const snapshot = await getDocs(collection(db, 'recommendedMovies'))
@@ -243,6 +245,61 @@ export default function AdminPage() {
     } else {
       console.warn('⚠️ No valid RSVP match found for removal', { movieId, seat })
     }
+  }
+
+  const handleAddGuest = async (movieId: string) => {
+    const formData = addGuestForms[movieId]
+
+    if (!formData?.name || !formData?.email || !formData?.seat) {
+      alert('Please fill in all fields')
+      return
+    }
+
+    // Check if seat is already taken
+    const seatTaken = rsvps[movieId]?.find(r => r.seat === formData.seat)
+    if (seatTaken) {
+      alert('This seat is already taken')
+      return
+    }
+
+    setAddGuestStatus(prev => ({ ...prev, [movieId]: 'adding' }))
+
+    try {
+      // Add RSVP to Firebase with email field
+      await addDoc(collection(db, 'rsvps'), {
+        movieId,
+        seat: formData.seat,
+        name: formData.name,
+        email: formData.email,
+        createdAt: new Date()
+      })
+
+      // Refresh RSVPs
+      await fetchAllMovies()
+
+      // Clear form and show success
+      setAddGuestForms(prev => ({ ...prev, [movieId]: { name: '', email: '', seat: null } }))
+      setAddGuestStatus(prev => ({ ...prev, [movieId]: 'success' }))
+      setTimeout(() => setAddGuestStatus(prev => ({ ...prev, [movieId]: 'idle' })), 3000)
+    } catch (err) {
+      console.error('Failed to add guest:', err)
+      setAddGuestStatus(prev => ({ ...prev, [movieId]: 'error' }))
+    }
+  }
+
+  const getNotifyEmailLink = (movie: Movie, guest: { name: string; email: string; seat: number }) => {
+    const subject = `Your seat for ${movie.title} - Reels & Rye`
+    const body = `Hey ${guest.name},
+
+I just grabbed your seat for the upcoming showing of ${movie.title} on ${movie.date} at ${movie.time}. You can reserve your own seat for future shows here: https://reelsandrye.netlify.app
+
+Sign up and grab a spot at future shows - see you soon!
+
+Cheers,
+
+Jim`
+
+    return `mailto:${guest.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
   }
 
   if (!passwordEntered) {
@@ -512,6 +569,17 @@ export default function AdminPage() {
                       {isTaken ? (isConfirming ? '❌' : guest.name.split(' ')[0]) : seat}
                     </button>
 
+                    {/* Notify Button */}
+                    {isTaken && guest?.email && (
+                      <a
+                        href={getNotifyEmailLink(movie, { name: guest.name, email: guest.email, seat })}
+                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mt-1 block"
+                        title="Send email notification"
+                      >
+                        📧
+                      </a>
+                    )}
+
                     {isConfirming && guest && (
                       <div className="absolute top-16 left-1/2 -translate-x-1/2 w-52 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm rounded shadow-md z-10">
                         <p className="mb-2 text-center">
@@ -536,6 +604,66 @@ export default function AdminPage() {
                   </div>
                 )
               })}
+            </div>
+
+            {/* Add Guest Form */}
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 mt-4 space-y-3">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Add Guest to Seat</h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                <input
+                  type="text"
+                  placeholder="Guest Name"
+                  value={addGuestForms[movie.id]?.name || ''}
+                  onChange={(e) => setAddGuestForms(prev => ({
+                    ...prev,
+                    [movie.id]: { ...prev[movie.id], name: e.target.value, email: prev[movie.id]?.email || '', seat: prev[movie.id]?.seat || null }
+                  }))}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm"
+                />
+
+                <input
+                  type="email"
+                  placeholder="Guest Email"
+                  value={addGuestForms[movie.id]?.email || ''}
+                  onChange={(e) => setAddGuestForms(prev => ({
+                    ...prev,
+                    [movie.id]: { ...prev[movie.id], email: e.target.value, name: prev[movie.id]?.name || '', seat: prev[movie.id]?.seat || null }
+                  }))}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm"
+                />
+
+                <select
+                  value={addGuestForms[movie.id]?.seat || ''}
+                  onChange={(e) => setAddGuestForms(prev => ({
+                    ...prev,
+                    [movie.id]: { ...prev[movie.id], seat: e.target.value ? parseInt(e.target.value) : null, name: prev[movie.id]?.name || '', email: prev[movie.id]?.email || '' }
+                  }))}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm"
+                >
+                  <option value="">Select Seat</option>
+                  {[1, 2, 3, 4, 5].map(seatNum => {
+                    const isTaken = rsvps[movie.id]?.find(r => r.seat === seatNum)
+                    if (isTaken) return null
+                    return <option key={seatNum} value={seatNum}>Seat {seatNum}</option>
+                  })}
+                </select>
+
+                <button
+                  onClick={() => handleAddGuest(movie.id)}
+                  disabled={addGuestStatus[movie.id] === 'adding'}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 text-sm font-medium"
+                >
+                  {addGuestStatus[movie.id] === 'adding' ? 'Adding...' : 'Add Guest'}
+                </button>
+              </div>
+
+              {addGuestStatus[movie.id] === 'success' && (
+                <p className="text-green-600 text-sm">✅ Guest added successfully!</p>
+              )}
+              {addGuestStatus[movie.id] === 'error' && (
+                <p className="text-red-600 text-sm">❌ Failed to add guest</p>
+              )}
             </div>
           </div>
         ))}
