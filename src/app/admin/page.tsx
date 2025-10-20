@@ -232,7 +232,7 @@ export default function AdminPage() {
 
     if (match && match.id) {
       try {
-        console.log('🗑️ Deleting RSVP with ID:', match.id)
+        console.log('🗑 Removing RSVP from Firestore')
         await deleteDoc(doc(db, 'rsvps', match.id))
         setRsvps(prev => ({
           ...prev,
@@ -243,7 +243,7 @@ export default function AdminPage() {
         console.error('❌ Error deleting RSVP:', err)
       }
     } else {
-      console.warn('⚠️ No valid RSVP match found for removal', { movieId, seat })
+      console.warn('⚠ RSVP not found for removal')
     }
   }
 
